@@ -1,9 +1,9 @@
 import type { ExecutionResult } from "./types"
 
-const JUDGE0_API_URL = "https://judge0-ce.p.rapidapi.com"
-const RAPIDAPI_KEY = "b4c7fd0ecdmsh98dacd9dab27f38p11724ajsn6ca2db484cc2"
-const RAPIDAPI_HOST = "judge0-ce.p.rapidapi.com"
-const C_LANGUAGE_ID = 50
+const JUDGE0_API_URL = process.env.JUDGE0_API_URL!
+const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY!
+const RAPIDAPI_HOST = process.env.RAPIDAPI_HOST!
+const C_LANGUAGE_ID = process.env.C_LANGUAGE_ID!
 
 export async function executeCode(code: string, input = ""): Promise<ExecutionResult> {
   try {
