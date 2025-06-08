@@ -45,7 +45,7 @@ export function CodeEditor({ program, code, onCodeChange, onRun, onCopy, isRunni
             {copied ? <Check className="h-4 w-4 mr-2" /> : <Copy className="h-4 w-4 mr-2" />}
             {copied ? "Copied" : "Copy"}
           </Button>
-          <Button size="sm" onClick={onRun} disabled={isRunning}>
+          <Button size="sm" onClick={onRun} disabled={isRunning} className="bg-gradient-to-br from-green-500 to-green-600 hover:from-green-600 hover:to-green-700">
             {isRunning ? <Loader2 className="h-4 w-4 mr-2 animate-spin" /> : <Play className="h-4 w-4 mr-2" />}
             {isRunning ? "Running..." : "Run"}
           </Button>

@@ -45,7 +45,7 @@ export function InputOutput({ input, onInputChange, output, stats }: InputOutput
             placeholder="Enter input for your program (if needed)..."
           />
         </TabsContent>
-        <TabsContent value="output" className="flex-1 p-1 overflow-y-auto">
+        <TabsContent value="output" className="flex-1 p-2 mt-0 overflow-y-auto">
           <div className="bg-muted/80 shadow-md font-mono text-sm p-4 rounded-md">
             <pre className="whitespace-pre-wrap">{output || 'Click "Run" to execute your code...'}</pre>
           </div>

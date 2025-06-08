@@ -158,9 +158,9 @@ export default function CodeSandbox() {
           // Desktop Layout
           <ResizablePanelGroup direction="horizontal" className="min-h-[calc(100vh-6rem)] overflow-y-hidden gap-1">
             {/* Left panel - Problem description and complexity analysis */}
-            <ResizablePanel defaultSize={30} minSize={20} className="border rounded-lg">
+            <ResizablePanel defaultSize={30} className="border rounded-lg">
               <div className="h-full">
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col p-1">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col p-2">
                   <TabsList className="grid w-full grid-cols-2 flex-shrink-0">
                     <TabsTrigger value="description">Description</TabsTrigger>
                     <TabsTrigger value="complexity">Complexity</TabsTrigger>
@@ -181,7 +181,7 @@ export default function CodeSandbox() {
             <ResizablePanel defaultSize={70} className="">
               <ResizablePanelGroup direction="vertical" className="gap-1">
                 {/* Code editor */}
-                <ResizablePanel defaultSize={70} minSize={30} className="border rounded-lg">
+                <ResizablePanel defaultSize={70} className="border rounded-lg">
                   <div className="h-full">
                     <CodeEditor
                       program={selectedProgram}
@@ -197,7 +197,7 @@ export default function CodeSandbox() {
                 <ResizableHandle withHandle className=" bg-background hover:bg-[var(--color-section-splitter)] transition-all"/>
 
                 {/* Input/Output */}
-                <ResizablePanel defaultSize={30} minSize={20} className="border rounded-lg">
+                <ResizablePanel defaultSize={30} className="border rounded-lg">
                   <div className="h-full">
                     <InputOutput input={input} onInputChange={setInput} output={output} stats={executionStats} />
                   </div>

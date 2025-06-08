@@ -36,7 +36,7 @@ export function ProgramDescription({ program }: ProgramDescriptionProps) {
         </div>
       </CardHeader>
       <CardContent className="flex-1 px-4 py-0">
-        <ScrollArea className="h-[calc(100vh-14rem)]">
+        <ScrollArea className="h-[calc(100vh-17rem)]">
           <div className="space-y-4 pr-4">
             <div className="text-muted-foreground">{program.description}</div>
 
