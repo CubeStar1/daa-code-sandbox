@@ -81,7 +81,7 @@ export default function CodeSandbox() {
     <>
     <div className="min-h-screen bg-background flex flex-col">
       <div className="border-b">
-        <div className="container mx-auto p-4 flex flex-col md:flex-row items-center gap-4">
+        <div className="container mx-auto p-3 flex flex-col md:flex-row items-center gap-4">
           {/* Title Section */}
           <div className="w-full md:w-auto mb-2 md:mb-0 self-start md:self-center">
             <h1 className="text-xl font-bold">DAA Lab</h1>

@@ -25,7 +25,7 @@ export function ComplexityAnalysis({ program }: ComplexityAnalysisProps) {
         <CardTitle className="text-lg">Time Complexity Analysis</CardTitle>
       </CardHeader>
       <CardContent className="flex-1 overflow-hidden px-4 py-0">
-        <ScrollArea className="h-[calc(100vh-17rem)]">
+        <ScrollArea className="h-[calc(100vh-16rem)]">
           <div className="space-y-4 pr-4">
             <Table>
               <TableHeader>
