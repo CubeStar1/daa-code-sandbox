@@ -40,7 +40,7 @@ export function CodeEditor({ program, code, onCodeChange, onRun, onCopy, isRunni
       <div className="flex items-center justify-between p-2 border-b">
         <div className="flex items-center">
           <span className="bg-primary/10 text-primary rounded px-2 py-1 text-xs font-medium mr-2">C</span>
-          <span className="text-sm text-muted-foreground">{program.name.toLowerCase().replace(/\s+/g, "-")}.c</span>
+          <span className="hidden md:block text-sm text-muted-foreground">{program.name.toLowerCase().replace(/\s+/g, "-")}.c</span>
         </div>
         <div className="flex gap-2">
           <Button variant="outline" size="sm" onClick={() => setIsEditing(!isEditing)}>
