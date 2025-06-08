@@ -73,5 +73,29 @@ Thus, the time complexity is exponential, O(2^n), as each disk added roughly dou
 The space complexity is determined by the maximum depth of the recursion stack. Since the function calls itself for n-1 disks, the maximum depth of the stack will be n. Therefore, the space complexity is O(n).
     `,
   },
-  code: "#include <stdio.h>\n\nvoid hanoi(int n, char src, char aux, char dest)\n{\n    if (n == 0) return;\n\n    hanoi(n - 1, src, dest, aux);\n    printf(\"Move disk %d from %c -> %c\\n\", n, src, dest);\n    hanoi(n - 1, aux, src, dest);\n}\n\nint main(void)\n{\n    int disks;\n    printf(\"Enter number of disks for Tower of Hanoi: \");\n    scanf(\"%d\", &disks);\n    printf(\"\\nSteps to solve Tower of Hanoi with %d disks:\\n\", disks);\n    hanoi(disks, 'A', 'B', 'C');\n\n    return 0;\n}",
+  code: `
+#include <stdio.h>
+
+void hanoi(int n, char src, char aux, char dest)
+{
+    if (n == 0) return;
+
+    hanoi(n - 1, src, dest, aux);
+    printf("Move disk %d from %c -> %c\\n", n, src, dest);
+    hanoi(n - 1, aux, src, dest);
 }
+
+int main(void)
+{
+    int disks;
+    printf("Enter number of disks for Tower of Hanoi: \\n");
+    scanf("%d", &disks);
+    printf("Steps to solve Tower of Hanoi with %d disks:\\n", disks);
+    hanoi(disks, 'A', 'B', 'C');
+
+    return 0;
+}
+`,
+sampleInput: "3"
+}
+

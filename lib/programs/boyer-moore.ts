@@ -103,5 +103,91 @@ The Boyer-Moore algorithm is renowned for its efficiency in string searching. It
 -   However, Boyer-Moore's preprocessing, particularly for the good-suffix rule, is more complex to implement correctly than Horspool's simpler shift table.
     `,
   },
-  code: "#include <stdio.h>\n#include <string.h>\n#include <limits.h>\n\n#define ALPHABET_SIZE 256\n\nint max(int a, int b) { return (a > b) ? a : b; }\n\nvoid badCharHeuristic(const char *str, int size, int badchar[ALPHABET_SIZE]) {\n    int i;\n    for (i = 0; i < ALPHABET_SIZE; i++)\n        badchar[i] = -1;\n    for (i = 0; i < size; i++)\n        badchar[(unsigned char)str[i]] = i;\n}\n\nvoid goodSuffixHeuristic(const char *pat, int m, int borderPos[], int shift[]) {\n    int i = m, j = m + 1;\n    borderPos[i] = j;\n\n    while (i > 0) {\n        while (j <= m && pat[i - 1] != pat[j - 1]) {\n            if (shift[j] == 0)\n                shift[j] = j - i;\n            j = borderPos[j];\n        }\n        i--; j--;\n        borderPos[i] = j;\n    }\n\n    j = borderPos[0];\n    for (i = 0; i <= m; i++) {\n        if (shift[i] == 0)\n            shift[i] = j;\n        if (i == j)\n            j = borderPos[j];\n    }\n}\n\nint boyerMoore(const char *text, const char *pattern) {\n    int m = strlen(pattern);\n    int n = strlen(text);\n    if (m == 0 || m > n) return -1;\n\n    int badchar[ALPHABET_SIZE];\n    int borderPos[m + 1];\n    int goodSuffixShift[m + 1];\n\n    for(int k=0; k <= m; ++k) {\n        goodSuffixShift[k] = 0;\n    }\n\n    badCharHeuristic(pattern, m, badchar);\n    goodSuffixHeuristic(pattern, m, borderPos, goodSuffixShift);\n\n    int s = 0; \n    while (s <= (n - m)) {\n        int j = m - 1;\n        while (j >= 0 && pattern[j] == text[s + j])\n            j--;\n\n        if (j < 0) {\n            return s; \n        } else {\n            int bc_shift = max(1, j - badchar[(unsigned char)text[s + j]]);\n            int gs_shift = goodSuffixShift[j + 1];\n            s += max(bc_shift, gs_shift);\n        }\n    }\n    return -1;\n}\n\nint main(void) {\n    char text[200], pat[50];\n    printf(\"Text   : \"); fgets(text, sizeof(text), stdin);\n    printf(\"Pattern: \"); fgets(pat,  sizeof(pat),  stdin);\n\n    text[strcspn(text, \"\\n\")] = '\\0';\n    pat[strcspn(pat, \"\\n\")] = '\\0';\n\n    int pos = boyerMoore(text, pat);\n    if (pos == -1)\n        printf(\"Pattern NOT found.\\n\");\n    else\n        printf(\"Pattern found at index %d.\\n\", pos);\n    return 0;\n}"
+  code: `
+#include <stdio.h>
+#include <string.h>
+#include <limits.h>
+
+#define ALPHABET_SIZE 256
+
+int max(int a, int b) { return (a > b) ? a : b; }
+
+void badCharHeuristic(const char *str, int size, int badchar[ALPHABET_SIZE]) {
+    for (int i = 0; i < ALPHABET_SIZE; i++)
+        badchar[i] = -1;
+    for (int i = 0; i < size; i++)
+        badchar[(unsigned char)str[i]] = i;
+}
+
+void goodSuffixHeuristic(const char *pat, int m, int borderPos[], int shift[]) {
+    int i = m, j = m + 1;
+    borderPos[i] = j;
+
+    while (i > 0) {
+        while (j <= m && pat[i - 1] != pat[j - 1]) {
+            if (shift[j] == 0)
+                shift[j] = j - i;
+            j = borderPos[j];
+        }
+        i--; j--;
+        borderPos[i] = j;
+    }
+
+    j = borderPos[0];
+    for (i = 0; i <= m; i++) {
+        if (shift[i] == 0)
+            shift[i] = j;
+        if (i == j)
+            j = borderPos[j];
+    }
+}
+
+int boyerMoore(const char *text, const char *pattern) {
+    int m = strlen(pattern);
+    int n = strlen(text);
+    if (m == 0 || m > n) return -1;
+
+    int badchar[ALPHABET_SIZE];
+    int borderPos[m + 1];
+    int goodSuffixShift[m + 1];
+    for(int k = 0; k <= m; ++k) {
+        goodSuffixShift[k] = 0;
+    }
+
+    badCharHeuristic(pattern, m, badchar);
+    goodSuffixHeuristic(pattern, m, borderPos, goodSuffixShift);
+
+    int s = 0;
+    while (s <= n - m) {
+        int j = m - 1;
+        while (j >= 0 && pattern[j] == text[s + j])
+            j--;
+
+        if (j < 0) {
+            return s;
+        } else {
+            int bc_shift = max(1, j - badchar[(unsigned char)text[s + j]]);
+            int gs_shift = goodSuffixShift[j + 1];
+            s += max(bc_shift, gs_shift);
+        }
+    }
+    return -1;
+}
+
+int main(void) {
+    char text[200], pat[50];
+    printf("Enter the text: \\n");
+    scanf("%s", text);
+    printf("Enter the pattern: \\n");
+    scanf("%s", pat);
+
+    int pos = boyerMoore(text, pat);
+    if (pos == -1)
+        printf("Pattern NOT found.\\n");
+    else
+        printf("Pattern found at index %d.\\n", pos);
+    return 0;
+}
+`,
+  sampleInput: "ABABDABACDABABCABAB\nABABCABAB"
 }

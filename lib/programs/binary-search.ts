@@ -116,16 +116,16 @@ int binarySearch(int arr[], int l, int r, int x) {
 
 int main() {
     int n, x;
-    printf("Enter number of elements: ");
+    printf("Enter number of elements: \\n");
     scanf("%d", &n);
     
     int arr[n];
-    printf("Enter %d sorted elements: ", n);
+    printf("Enter %d sorted elements: \\n", n);
     for (int i = 0; i < n; i++) {
         scanf("%d", &arr[i]);
     }
     
-    printf("Enter element to search: ");
+    printf("Enter element to search: \\n");
     scanf("%d", &x);
     
     int result = binarySearch(arr, 0, n - 1, x);
@@ -137,4 +137,5 @@ int main() {
     
     return 0;
 }`,
+sampleInput: "5\n1 3 5 7 9\n5",
 }

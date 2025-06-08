@@ -110,5 +110,62 @@ The choice of pivot significantly impacts performance:
 > **Note:** Despite its O(n²) worst case, Quick Sort is often faster in practice than Merge Sort and Heap Sort due to smaller constant factors and good cache performance when implemented well.
     `,
   },
-  code: "#include <stdio.h>\n\nvoid swap(int* a, int* b) {\n    int t = *a;\n    *a = *b;\n    *b = t;\n}\n\nint partition(int arr[], int low, int high) {\n    int pivot = arr[high];\n    int i = (low - 1);\n\n    for (int j = low; j <= high - 1; j++) {\n        if (arr[j] <= pivot) {\n            i++;\n            swap(&arr[i], &arr[j]);\n        }\n    }\n    swap(&arr[i + 1], &arr[high]);\n    return (i + 1);\n}\n\nvoid quickSort(int arr[], int low, int high) {\n    if (low < high) {\n        int pi = partition(arr, low, high);\n        quickSort(arr, low, pi - 1);\n        quickSort(arr, pi + 1, high);\n    }\n}\n\nvoid printArray(int arr[], int size) {\n    int i;\n    for (i = 0; i < size; i++)\n        printf(\"%d \", arr[i]);\n    printf(\"\\n\");\n}\n\nint main() {\n    int n;\n    printf(\"Enter number of elements: \");\n    scanf(\"%d\", &n);\n\n    int arr[n];\n    printf(\"Enter %d integers: \\n\", n);\n    for (int i = 0; i < n; ++i) scanf(\"%d\", &arr[i]);\n\n    quickSort(arr, 0, n - 1);\n    printf(\"Sorted array: \\n\");\n    printArray(arr, n);\n    return 0;\n}",
+  code: `
+#include <stdio.h>
+
+void swap(int* a, int* b) {
+    int t = *a;
+    *a = *b;
+    *b = t;
+}
+
+int partition(int arr[], int low, int high) {
+    int pivot = arr[high];
+    int i = (low - 1);
+
+    for (int j = low; j <= high - 1; j++) {
+        if (arr[j] <= pivot) {
+            i++;
+            swap(&arr[i], &arr[j]);
+        }
+    }
+    swap(&arr[i + 1], &arr[high]);
+    return (i + 1);
+}
+
+void quickSort(int arr[], int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high);
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
+void printArray(int arr[], int size) {
+    for (int i = 0; i < size; i++)
+        printf("%d ", arr[i]);
+    printf("\\n");
+}
+
+int main() {
+    int n;
+    printf("Enter number of elements: ");
+    scanf("%d", &n);
+
+    if (n <= 0) {
+        printf("Invalid array size.\\n");
+        return 1;
+    }
+
+    int arr[n];
+    printf("Enter %d integers: \\n", n);
+    for (int i = 0; i < n; ++i) scanf("%d", &arr[i]);
+
+    quickSort(arr, 0, n - 1);
+    printf("Sorted array: \\n");
+    printArray(arr, n);
+    return 0;
+}
+`,
+sampleInput: "6\n64 34 25 12 22 11"
 }

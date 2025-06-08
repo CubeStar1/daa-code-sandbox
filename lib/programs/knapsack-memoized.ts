@@ -103,7 +103,7 @@ Therefore, the overall space complexity is dominated by the memoization table, r
   },
   code: `
 #include <stdio.h>
-#include <string.h> // For memset
+#include <string.h> 
 
 #define MAX_ITEMS 100
 #define MAX_CAPACITY 1000
@@ -140,23 +140,23 @@ int main(void) {
     int weights[MAX_ITEMS];
     int values[MAX_ITEMS];
 
-    printf("Enter number of items (max %d): ", MAX_ITEMS);
+    printf("Enter number of items (max %d): \\n", MAX_ITEMS);
     scanf("%d", &n);
 
     if (n <= 0 || n > MAX_ITEMS) {
-        printf("Invalid number of items.\n");
+        printf("Invalid number of items.\\n");
         return 1;
     }
 
-    printf("Enter knapsack capacity (max %d): ", MAX_CAPACITY);
+    printf("Enter knapsack capacity (max %d): \\n", MAX_CAPACITY);
     scanf("%d", &W);
 
     if (W < 0 || W > MAX_CAPACITY) {
-        printf("Invalid knapsack capacity.\n");
+        printf("Invalid knapsack capacity.\\n");
         return 1;
     }
 
-    printf("Enter weight and value of each item (weight value):\n");
+    printf("Enter weight and value of each item (weight value):\\n");
     for (int i = 0; i < n; ++i) {
         printf("Item %d: ", i + 1);
         scanf("%d %d", &weights[i], &values[i]);
@@ -171,9 +171,10 @@ int main(void) {
 
     int max_value = knapsack_memoized(weights, values, 0, W, n);
 
-    printf("Maximum value that can be obtained = %d\n", max_value);
+    printf("Maximum value that can be obtained = %d\\n", max_value);
 
     return 0;
 }
   `,
+sampleInput: "3\n50\n10 60\n20 100\n30 120",
 };

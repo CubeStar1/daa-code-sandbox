@@ -94,10 +94,10 @@ If an adjacency list were used, it would be O(V+E).
   },
   code: `
 #include <stdio.h>
-#include <limits.h> // For INT_MAX
-#include <stdbool.h> // For bool type
+#include <limits.h> 
+#include <stdbool.h> 
 
-#define MAX_VERTICES 100 // Maximum number of vertices
+#define MAX_VERTICES 100 
 #define INF 99999
 
 int minDistance(int dist[], bool sptSet[], int V) {
@@ -113,12 +113,12 @@ int minDistance(int dist[], bool sptSet[], int V) {
 }
 
 void printSolution(int dist[], int V, int src) {
-    printf("Vertex   Distance from Source %d\n", src);
+    printf("Vertex   Distance from Source %d\\n", src);
     for (int i = 0; i < V; i++) {
         if (dist[i] == INF) {
-            printf("%d \t\t %s\n", i, "INF");
+            printf("%d \\t\\t %s\\n", i, "INF");
         } else {
-            printf("%d \t\t %d\n", i, dist[i]);
+            printf("%d \\t\\t %d\\n", i, dist[i]);
         }
     }
 }
@@ -158,27 +158,27 @@ int main(void) {
     int graph[MAX_VERTICES][MAX_VERTICES];
     int src_vertex;
 
-    printf("Enter the number of vertices (max %d): ", MAX_VERTICES);
+    printf("Enter the number of vertices (max %d): \\n", MAX_VERTICES);
     scanf("%d", &V);
 
     if (V <= 0 || V > MAX_VERTICES) {
-        printf("Invalid number of vertices.\n");
+        printf("Invalid number of vertices.\\n");
         return 1;
     }
 
-    printf("Enter the adjacency matrix for the graph (%d x %d):\n", V, V);
-    printf("(Use %d for infinity/no direct path, 0 for self-loops if no weight):\n", INF);
+    printf("Enter the adjacency matrix for the graph (%d x %d):\\n", V, V);
+    printf("(Use %d for infinity/no direct path, 0 for self-loops if no weight):\\n", INF);
     for (int i = 0; i < V; i++) {
         for (int j = 0; j < V; j++) {
             scanf("%d", &graph[i][j]);
         }
     }
 
-    printf("Enter the source vertex (0 to %d): ", V - 1);
+    printf("Enter the source vertex (0 to %d): \\n", V - 1);
     scanf("%d", &src_vertex);
 
     if (src_vertex < 0 || src_vertex >= V) {
-        printf("Invalid source vertex.\n");
+        printf("Invalid source vertex.\\n");
         return 1;
     }
 
@@ -187,4 +187,5 @@ int main(void) {
     return 0;
 }
   `,
+sampleInput: "9\n0 4 0 0 0 0 0 8 0\n4 0 8 0 0 0 0 11 0\n0 8 0 7 0 4 0 0 2\n0 0 7 0 9 14 0 0 0\n0 0 0 9 0 10 0 0 0\n0 0 4 14 10 0 2 0 0\n0 0 0 0 0 2 0 1 6\n8 11 0 0 0 0 1 0 7\n0 0 2 0 0 0 6 7 0\n0",
 };

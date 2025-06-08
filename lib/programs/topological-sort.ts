@@ -90,5 +90,79 @@ So, for an adjacency list representation, the space is O(V + E). For the provide
 - The \\\`deg[u]\\\` effectively tells how many neighbors \\\`u\\\` has, and \\\`adj[u][0...deg[u]-1]\\\` are those neighbors.
     `,
   },
-  code: "#include <stdio.h>\n#include <stdlib.h>\n\n#define MAX 100\n\ntypedef struct {\n    int data[MAX];\n    int front, rear;\n} Queue;\n\nvoid initQueue(Queue *q) { q->front = q->rear = 0; }\nint  isEmpty(Queue *q) { return q->front == q->rear; }\nvoid enqueue(Queue *q, int x) { q->data[q->rear++] = x; }\nint  dequeue(Queue *q) { return q->data[q->front++]; }\n\nint main(void)\n{\n    int V, E;\n    printf(\"Enter number of vertices (max %d): \", MAX);\n    scanf(\"%d\", &V);\n\n    if (V <= 0 || V > MAX) {\n        printf(\"Invalid number of vertices\\n\");\n        return 0;\n    }\n\n    int adj[MAX][MAX];\n    int deg[MAX];\n    int indeg[MAX];\n\n    for (int i = 0; i < V; ++i) {\n        deg[i] = indeg[i] = 0;\n    }\n\n    printf(\"Enter number of directed edges: \");\n    scanf(\"%d\", &E);\n\n    printf(\"Enter edges as pairs: src dest (0-based labels)\\n\");\n    for (int i = 0; i < E; ++i) {\n        int u, v;\n        scanf(\"%d %d\", &u, &v);\n        adj[u][deg[u]++] = v;\n        indeg[v]++;\n    }\n\n    Queue q;\n    initQueue(&q);\n\n    for (int i = 0; i < V; ++i)\n        if (indeg[i] == 0) enqueue(&q, i);\n\n    int visited = 0;\n    printf(\"\\nTopological order:\\n\");\n    while (!isEmpty(&q)) {\n        int u = dequeue(&q);\n        printf(\"%d \", u);\n        visited++;\n\n        for (int k = 0; k < deg[u]; ++k) {\n            int v = adj[u][k];\n            if (--indeg[v] == 0)\n                enqueue(&q, v);\n        }\n    }\n    putchar('\\n');\n\n    if (visited != V)\n        printf(\"Graph has a cycle! No topological ordering.\\n\");\n\n    return 0;\n}",
+  code: `
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX 100
+
+typedef struct {
+    int data[MAX];
+    int front, rear;
+} Queue;
+
+void initQueue(Queue *q) { q->front = q->rear = 0; }
+int  isEmpty(Queue *q) { return q->front == q->rear; }
+void enqueue(Queue *q, int x) { q->data[q->rear++] = x; }
+int  dequeue(Queue *q) { return q->data[q->front++]; }
+
+int main(void)
+{
+    int V, E;
+    printf("Enter number of vertices (max %d): \\n", MAX);
+    scanf("%d", &V);
+
+    if (V <= 0 || V > MAX) {
+        printf("Invalid number of vertices\\n");
+        return 0;
+    }
+
+    int adj[MAX][MAX];
+    int deg[MAX];
+    int indeg[MAX];
+
+    for (int i = 0; i < V; ++i) {
+        deg[i] = indeg[i] = 0;
+    }
+
+    printf("Enter number of directed edges: \\n");
+    scanf("%d", &E);
+
+    printf("Enter edges as pairs: src dest (0-based labels)\\n");
+    for (int i = 0; i < E; ++i) {
+        int u, v;
+        scanf("%d %d", &u, &v);
+        adj[u][deg[u]++] = v;
+        indeg[v]++;
+    }
+
+    Queue q;
+    initQueue(&q);
+
+    for (int i = 0; i < V; ++i)
+        if (indeg[i] == 0) enqueue(&q, i);
+
+    int visited = 0;
+    printf("Topological order:\\n");
+    while (!isEmpty(&q)) {
+        int u = dequeue(&q);
+        printf("%d ", u);
+        visited++;
+
+        for (int k = 0; k < deg[u]; ++k) {
+            int v = adj[u][k];
+            if (--indeg[v] == 0)
+                enqueue(&q, v);
+        }
+    }
+    putchar('\\n');
+
+    if (visited != V)
+        printf("Graph has a cycle! No topological ordering.\\n");
+
+    return 0;
 }
+`,
+sampleInput: "6\n6\n5 2\n5 0\n4 0\n4 1\n2 3\n3 1"
+}
+

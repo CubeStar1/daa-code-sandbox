@@ -94,5 +94,144 @@ The dominant factor is O(V).
 - The space complexity for the graph itself in the C code is O(MAX_VERTICES²), which is O(V²) if MAX_VERTICES is considered proportional to V.
     `,
   },
-  code: "#include <stdio.h>\n#include <stdlib.h>\n\n#define MAX_VERTICES 100\n\n// Queue structure for BFS\ntypedef struct {\n    int items[MAX_VERTICES];\n    int front;\n    int rear;\n} Queue;\n\n// Create an empty queue\nQueue* createQueue() {\n    Queue* q = (Queue*)malloc(sizeof(Queue));\n    q->front = -1;\n    q->rear = -1;\n    return q;\n}\n\n// Check if the queue is empty\nint isEmpty(Queue* q) {\n    return q->rear == -1;\n}\n\n// Add an element to the queue\nvoid enqueue(Queue* q, int value) {\n    if (q->rear == MAX_VERTICES - 1)\n        printf(\"Queue is full!!\\n\");\n    else {\n        if (q->front == -1)\n            q->front = 0;\n        q->rear++;\n        q->items[q->rear] = value;\n    }\n}\n\n// Remove an element from the queue\nint dequeue(Queue* q) {\n    int item;\n    if (isEmpty(q)) {\n        printf(\"Queue is empty!!\\n\");\n        item = -1;\n    } else {\n        item = q->items[q->front];\n        q->front++;\n        if (q->front > q->rear) {\n            q->front = q->rear = -1;\n        }\n    }\n    return item;\n}\n\n// Graph structure: Adjacency Matrix\ntypedef struct {\n    int adj[MAX_VERTICES][MAX_VERTICES];\n    int numVertices;\n} Graph;\n\n// Create a graph\nGraph* createGraph(int vertices) {\n    Graph* graph = (Graph*)malloc(sizeof(Graph));\n    graph->numVertices = vertices;\n\n    for (int i = 0; i < vertices; i++) {\n        for (int j = 0; j < vertices; j++) {\n            graph->adj[i][j] = 0;\n        }\n    }\n    return graph;\n}\n\n// Add edge to an undirected graph\nvoid addEdge(Graph* graph, int src, int dest) {\n    graph->adj[src][dest] = 1;\n    graph->adj[dest][src] = 1;\n}\n\n// BFS algorithm\nvoid bfs(Graph* graph, int startVertex) {\n    Queue* q = createQueue();\n\n    int visited[MAX_VERTICES];\n    for (int i = 0; i < graph->numVertices; i++) {\n        visited[i] = 0;\n    }\n\n    visited[startVertex] = 1;\n    enqueue(q, startVertex);\n\n    printf(\"Breadth First Traversal (starting from vertex %d):\\n\", startVertex);\n\n    while (!isEmpty(q)) {\n        int currentVertex = dequeue(q);\n        printf(\"%d \", currentVertex);\n\n        for (int i = 0; i < graph->numVertices; i++) {\n            if (graph->adj[currentVertex][i] == 1 && visited[i] == 0) {\n                visited[i] = 1;\n                enqueue(q, i);\n            }\n        }\n    }\n    printf(\"\\n\");\n    free(q);\n}\n\nint main() {\n    int V, E, startNode;\n    printf(\"Enter the number of vertices (max %d): \", MAX_VERTICES);\n    scanf(\"%d\", &V);\n\n    if (V <= 0 || V > MAX_VERTICES) {\n        printf(\"Invalid number of vertices.\\n\");\n        return 1;\n    }\n\n    Graph* graph = createGraph(V);\n\n    printf(\"Enter the number of edges: \");\n    scanf(\"%d\", &E);\n\n    printf(\"Enter edges as pairs (src dest, 0-based index):\\n\");\n    for (int i = 0; i < E; i++) {\n        int src, dest;\n        scanf(\"%d %d\", &src, &dest);\n        if (src >= 0 && src < V && dest >= 0 && dest < V) {\n            addEdge(graph, src, dest);\n        } else {\n            printf(\"Invalid edge: (%d, %d). Vertices out of bound.\\n\", src, dest);\n            i--; \n        }\n    }\n\n    printf(\"Enter the starting node for BFS (0 to %d): \", V - 1);\n    scanf(\"%d\", &startNode);\n\n    if (startNode < 0 || startNode >= V) {\n        printf(\"Invalid starting node.\\n\");\n        free(graph);\n        return 1;\n    }\n\n    bfs(graph, startNode);\n\n    free(graph);\n    return 0;\n}",
+  sampleInput: "7\n8\n0 1\n0 2\n1 3\n1 4\n2 5\n2 6\n3 4\n5 6\n0",
+  code: `
+#include <stdio.h>
+#include <stdlib.h>
+
+#define MAX_VERTICES 100
+
+typedef struct {
+    int items[MAX_VERTICES];
+    int front;
+    int rear;
+} Queue;
+
+Queue* createQueue() {
+    Queue* q = (Queue*)malloc(sizeof(Queue));
+    q->front = -1;
+    q->rear = -1;
+    return q;
+}
+
+int isEmpty(Queue* q) {
+    return q->rear == -1;
+}
+void enqueue(Queue* q, int value) {
+    if (q->rear == MAX_VERTICES - 1)
+        printf("Queue is full!!\\n");
+    else {
+        if (q->front == -1)
+            q->front = 0;
+        q->rear++;
+        q->items[q->rear] = value;
+    }
+}
+
+int dequeue(Queue* q) {
+    int item;
+    if (isEmpty(q)) {
+        printf("Queue is empty!!\\n");
+        item = -1;
+    } else {
+        item = q->items[q->front];
+        q->front++;
+        if (q->front > q->rear) {
+            q->front = q->rear = -1;
+        }
+    }
+    return item;
+}
+
+typedef struct {
+    int adj[MAX_VERTICES][MAX_VERTICES];
+    int numVertices;
+} Graph;
+Graph* createGraph(int vertices) {
+    Graph* graph = (Graph*)malloc(sizeof(Graph));
+    graph->numVertices = vertices;
+
+    for (int i = 0; i < vertices; i++) {
+        for (int j = 0; j < vertices; j++) {
+            graph->adj[i][j] = 0;
+        }
+    }
+    return graph;
+}
+
+void addEdge(Graph* graph, int src, int dest) {
+    graph->adj[src][dest] = 1;
+    graph->adj[dest][src] = 1;
+}
+
+void bfs(Graph* graph, int startVertex) {
+    Queue* q = createQueue();
+
+    int visited[MAX_VERTICES];
+    for (int i = 0; i < graph->numVertices; i++) {
+        visited[i] = 0;
+    }
+
+    visited[startVertex] = 1;
+    enqueue(q, startVertex);
+
+    printf("Breadth First Traversal (starting from vertex %d):\\n", startVertex);
+
+    while (!isEmpty(q)) {
+        int currentVertex = dequeue(q);
+        printf("%d ", currentVertex);
+
+        for (int i = 0; i < graph->numVertices; i++) {
+            if (graph->adj[currentVertex][i] == 1 && visited[i] == 0) {
+                visited[i] = 1;
+                enqueue(q, i);
+            }
+        }
+    }
+    printf("\\n");
+    free(q);
+}
+
+int main() {
+    int V, E, startNode;
+    printf("Enter the number of vertices (max %d): \\n", MAX_VERTICES);
+    scanf("%d", &V);
+
+    if (V <= 0 || V > MAX_VERTICES) {
+        printf("Invalid number of vertices.\\n");
+        return 1;
+    }
+
+    Graph* graph = createGraph(V);
+
+    printf("Enter the number of edges: \\n");
+    scanf("%d", &E);
+
+    printf("Enter edges as pairs (src dest, 0-based index):\\n");
+    for (int i = 0; i < E; i++) {
+        int src, dest;
+        scanf("%d %d", &src, &dest);
+        if (src >= 0 && src < V && dest >= 0 && dest < V) {
+            addEdge(graph, src, dest);
+        } else {
+            printf("Invalid edge: (%d, %d). Vertices out of bound.\\n", src, dest);
+            i--;
+        }
+    }
+
+    printf("Enter the starting node for BFS (0 to %d): \\n", V - 1);
+    scanf("%d", &startNode);
+
+    if (startNode < 0 || startNode >= V) {
+        printf("Invalid starting node.\\n");
+        free(graph);
+        return 1;
+    }
+
+    bfs(graph, startNode);
+
+    free(graph);
+    return 0;
+}
+`
 }

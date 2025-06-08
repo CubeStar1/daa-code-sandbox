@@ -113,7 +113,7 @@ int main(void)
     int max;        
     int i;          
 
-    printf("Enter how many numbers: ");
+    printf("Enter how many numbers: \\n");
     scanf("%d", &n);
 
     if (n <= 0) {                 
@@ -121,12 +121,12 @@ int main(void)
         return 0;
     }
 
-    printf("Enter number 1: ");
+    printf("Enter number 1: \\n");
     scanf("%d", &num);
     max = num;
 
     for (i = 2; i <= n; ++i) {
-        printf("Enter number %d: ", i);
+        printf("Enter number %d: \\n", i);
         scanf("%d", &num);
 
         if (num > max) {          
@@ -138,4 +138,5 @@ int main(void)
     return 0;
 }
 `,
+sampleInput: "5\n1 3 7 2 9",
 }

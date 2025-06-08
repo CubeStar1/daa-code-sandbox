@@ -40,7 +40,7 @@ export function ProgramSelector({ programs, selectedProgram, onProgramChange }: 
               </div>
             </SelectValue>
           </SelectTrigger>
-          <SelectContent>
+          <SelectContent className="h-[500px]">
             {programs.map((program) => (
               <SelectItem key={program.id} value={program.id}>
                 <div className="flex items-center justify-between w-full">

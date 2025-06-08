@@ -97,13 +97,13 @@ Floyd-Warshall is particularly useful for dense graphs where V is relatively sma
   },
   code: `
 #include <stdio.h>
-#include <limits.h> // For INT_MAX
+#include <limits.h> 
 
 #define MAX_VERTICES 100
-#define INF 99999 // A large value to represent infinity
+#define INF 99999 
 
 void printMatrix(int matrix[MAX_VERTICES][MAX_VERTICES], int V) {
-    printf("Shortest Path Matrix:\n");
+    printf("Shortest Path Matrix:\\n");
     for (int i = 0; i < V; i++) {
         for (int j = 0; j < V; j++) {
             if (matrix[i][j] == INF)
@@ -111,7 +111,7 @@ void printMatrix(int matrix[MAX_VERTICES][MAX_VERTICES], int V) {
             else
                 printf("%7d", matrix[i][j]);
         }
-        printf("\n");
+        printf("\\n");
     }
 }
 
@@ -119,26 +119,15 @@ void floydWarshall(int graph[MAX_VERTICES][MAX_VERTICES], int V) {
     int dist[MAX_VERTICES][MAX_VERTICES];
     int i, j, k;
 
-    // Initialize the solution matrix same as input graph matrix
-    // Or we can say the initial values of shortest distances are based
-    // on shortest paths considering no intermediate vertex
+
     for (i = 0; i < V; i++)
         for (j = 0; j < V; j++)
             dist[i][j] = graph[i][j];
 
-    // Add all vertices one by one to the set of intermediate vertices.
-    // ---> Before start of an iteration, we have shortest distances between all
-    //      pairs of vertices such that the shortest distances consider only the
-    //      vertices in set {0, 1, .. k-1} as intermediate vertices.
-    // ----> After the end of an iteration, vertex no. k is added to the set of
-    //       intermediate vertices and the set becomes {0, 1, .. k}
+
     for (k = 0; k < V; k++) {
-        // Pick all vertices as source one by one
         for (i = 0; i < V; i++) {
-            // Pick all vertices as destination for the above picked source
             for (j = 0; j < V; j++) {
-                // If vertex k is on the shortest path from i to j,
-                // then update the value of dist[i][j]
                 if (dist[i][k] != INF && dist[k][j] != INF && 
                     dist[i][k] + dist[k][j] < dist[i][j]) {
                     dist[i][j] = dist[i][k] + dist[k][j];
@@ -147,13 +136,11 @@ void floydWarshall(int graph[MAX_VERTICES][MAX_VERTICES], int V) {
         }
     }
 
-    // Print the shortest distance matrix
     printMatrix(dist, V);
 
-    // Check for negative cycles
     for (i = 0; i < V; i++) {
         if (dist[i][i] < 0) {
-            printf("\nGraph contains a negative weight cycle!\n");
+            printf("\\nGraph contains a negative weight cycle!\\n");
             return;
         }
     }
@@ -163,15 +150,15 @@ int main(void) {
     int V;
     int graph[MAX_VERTICES][MAX_VERTICES];
 
-    printf("Enter the number of vertices (max %d): ", MAX_VERTICES);
+    printf("Enter the number of vertices (max %d): \\n", MAX_VERTICES);
     scanf("%d", &V);
 
     if (V <= 0 || V > MAX_VERTICES) {
-        printf("Invalid number of vertices.\n");
+        printf("Invalid number of vertices.\\n");
         return 1;
     }
 
-    printf("Enter the adjacency matrix (weights, use %d for INF) for the graph (%d x %d):\n", INF, V, V);
+    printf("Enter the adjacency matrix (weights, use %d for INF) for the graph (%d x %d):\\n", INF, V, V);
     for (int i = 0; i < V; i++) {
         for (int j = 0; j < V; j++) {
             scanf("%d", &graph[i][j]);
@@ -183,4 +170,5 @@ int main(void) {
     return 0;
 }
   `,
+sampleInput: "4\n0 5 99999 10\n99999 0 3 99999\n99999 99999 0 1\n99999 99999 99999 0",
 };

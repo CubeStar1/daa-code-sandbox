@@ -124,7 +124,7 @@ void solve(int r)
 
 int main(void)
 {
-    printf("Enter N (<= %d): ", MAXN);
+    printf("Enter N (<= %d): \\n", MAXN);
     if (scanf("%d", &N) != 1 || N < 1 || N > MAXN) {
         puts("Invalid N");
         return 0;
@@ -140,4 +140,5 @@ int main(void)
     return 0;
 }
   `,
+sampleInput: "4",
 };

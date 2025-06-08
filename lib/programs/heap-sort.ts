@@ -97,5 +97,67 @@ Heap Sort is a comparison-based sorting technique based on a Binary Heap data st
 | Quick Sort   | O(n log n)  | O(n log n)   | O(n²)      | O(log n)          | ✗      |
     `,
   },
-  code: "#include <stdio.h>\n\nvoid heapify(int arr[], int n, int i) {\n    int largest = i;\n    int l = 2 * i + 1;\n    int r = 2 * i + 2;\n\n    if (l < n && arr[l] > arr[largest])\n        largest = l;\n\n    if (r < n && arr[r] > arr[largest])\n        largest = r;\n\n    if (largest != i) {\n        int swap = arr[i];\n        arr[i] = arr[largest];\n        arr[largest] = swap;\n        heapify(arr, n, largest);\n    }\n}\n\nvoid heapSort(int arr[], int n) {\n    for (int i = n / 2 - 1; i >= 0; i--)\n        heapify(arr, n, i);\n\n    for (int i = n - 1; i > 0; i--) {\n        int temp = arr[0];\n        arr[0] = arr[i];\n        arr[i] = temp;\n        heapify(arr, i, 0);\n    }\n}\n\nvoid printArray(int arr[], int n) {\n    for (int i = 0; i < n; ++i)\n        printf(\"%d \", arr[i]);\n    printf(\"\\n\");\n}\n\nint main() {\n    int n;\n    printf(\"Enter number of elements: \");\n    scanf(\"%d\", &n);\n\n    if (n <= 0) {\n        printf(\"Number of elements must be positive.\\n\");\n        return 1;\n    }\n\n    int arr[n];\n    printf(\"Enter %d integers: \\n\", n);\n    for (int i = 0; i < n; ++i)\n        scanf(\"%d\", &arr[i]);\n\n    heapSort(arr, n);\n\n    printf(\"Sorted array is \\n\");\n    printArray(arr, n);\n    return 0;\n}",
+  code: `
+#include <stdio.h>
+
+void heapify(int arr[], int n, int i) {
+    int largest = i;
+    int l = 2 * i + 1;
+    int r = 2 * i + 2;
+
+    if (l < n && arr[l] > arr[largest])
+        largest = l;
+
+    if (r < n && arr[r] > arr[largest])
+        largest = r;
+
+    if (largest != i) {
+        int swap = arr[i];
+        arr[i] = arr[largest];
+        arr[largest] = swap;
+        heapify(arr, n, largest);
+    }
+}
+
+void heapSort(int arr[], int n) {
+    for (int i = n / 2 - 1; i >= 0; i--)
+        heapify(arr, n, i);
+
+    for (int i = n - 1; i > 0; i--) {
+        int temp = arr[0];
+        arr[0] = arr[i];
+        arr[i] = temp;
+        heapify(arr, i, 0);
+    }
+}
+
+void printArray(int arr[], int n) {
+    for (int i = 0; i < n; ++i)
+        printf("%d ", arr[i]);
+    printf("\\n");
+}
+
+int main() {
+    int n;
+    printf("Enter number of elements: \\n");
+    scanf("%d", &n);
+
+    if (n <= 0) {
+        printf("Number of elements must be positive.\\n");
+        return 1;
+    }
+
+    int arr[n];
+    printf("Enter %d integers: \\n", n);
+    for (int i = 0; i < n; ++i)
+        scanf("%d", &arr[i]);
+
+    heapSort(arr, n);
+
+    printf("Sorted array is \\n");
+    printArray(arr, n);
+    return 0;
+}
+`,
+sampleInput: "5\n12 11 13 5 6"
 }

@@ -168,7 +168,7 @@ void mergeSort(int a[], int l, int r)
 int main(void)
 {
     int n;
-    printf("Enter number of elements: ");
+    printf("Enter number of elements: \\n");
     scanf("%d", &n);
 
     int arr[n];
@@ -183,4 +183,5 @@ int main(void)
     return 0;
 }
 `,
+sampleInput: "6\n64 34 25 12 22 11"
 }

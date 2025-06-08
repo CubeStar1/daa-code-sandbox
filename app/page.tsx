@@ -10,7 +10,11 @@ import { CodeEditor } from "@/components/code-editor"
 import { InputOutput } from "@/components/input-output"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { ProviderInfoPopover } from "@/components/provider-info-popover";
+import { useToast } from "@/components/ui/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 import type { Program, ExecutionResult } from "@/lib/types"
 
 export default function CodeSandbox() {
@@ -20,15 +24,18 @@ export default function CodeSandbox() {
   const [output, setOutput] = useState("")
   const [isRunning, setIsRunning] = useState(false)
   const [executionStats, setExecutionStats] = useState<{ time?: number; memory?: number }>({})
-  const [activeTab, setActiveTab] = useState("description")
+  const [activeTab, setActiveTab] = useState("description");
+  const [executionProvider, setExecutionProvider] = useState<'judge0' | 'onecompiler'>('onecompiler');
+  const { toast } = useToast();
 
   const handleProgramChange = (programId: string) => {
     const program = programs.find((p) => p.id === programId)
     if (program) {
-      setSelectedProgram(program)
-      setCode(program.code)
-      setOutput("")
-      setExecutionStats({})
+      setSelectedProgram(program);
+      setCode(program.code);
+      setInput(program.sampleInput || ""); // Set input to sampleInput or empty string
+      setOutput("");
+      setExecutionStats({});
     }
   }
 
@@ -45,9 +52,22 @@ export default function CodeSandbox() {
     setOutput("")
     setExecutionStats({})
 
-    const result: ExecutionResult = await executeCode(code, input)
+    const result: ExecutionResult = await executeCode(code, input, executionProvider);
 
-    setOutput(result.output)
+    if (result.isRateLimited) {
+      toast({
+        title: "Rate Limit Exceeded",
+        description: result.error || "You've made too many requests. Please wait and try again.",
+        variant: "destructive",
+      });
+      // Still set output to any error message provided, and clear stats
+      setOutput(result.error || ""); 
+      setExecutionStats({});
+      setIsRunning(false);
+      return;
+    }
+
+    setOutput(result.output);
     setExecutionStats({
       time: result.time,
       memory: result.memory,
@@ -56,6 +76,8 @@ export default function CodeSandbox() {
   }
 
   return (
+    <>
+      <Toaster />
     <div className="min-h-screen bg-background flex flex-col">
       <div className="border-b">
         <div className="container mx-auto p-4 flex items-center">
@@ -67,6 +89,21 @@ export default function CodeSandbox() {
             selectedProgram={selectedProgram}
             onProgramChange={handleProgramChange}
           />
+          <div className="ml-4 flex items-center space-x-2">
+            <Select 
+              value={executionProvider} 
+              onValueChange={(value) => setExecutionProvider(value as 'judge0' | 'onecompiler')}
+            >
+              <SelectTrigger className="w-[180px]">
+                <SelectValue placeholder="Select Provider" />
+              </SelectTrigger>
+              <SelectContent>
+                <SelectItem value="onecompiler">OneCompiler</SelectItem>
+                <SelectItem value="judge0">Judge0</SelectItem>
+              </SelectContent>
+            </Select>
+            <ProviderInfoPopover />
+          </div>
           <div className="flex-1 flex justify-end"> {/* Right part with ThemeToggle */}
             <ThemeToggle />
           </div>
@@ -125,5 +162,6 @@ export default function CodeSandbox() {
         </ResizablePanelGroup>
       </div>
     </div>
+    </>
   )
 }

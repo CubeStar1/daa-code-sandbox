@@ -106,7 +106,7 @@ void printMatrix(int matrix[MAX_VERTICES][MAX_VERTICES], int V) {
         for (int j = 0; j < V; j++) {
             printf("%d ", matrix[i][j]);
         }
-        printf("\n");
+        printf("\\n");
     }
 }
 
@@ -114,23 +114,15 @@ void warshall(int graph[MAX_VERTICES][MAX_VERTICES], int V) {
     int transitiveClosure[MAX_VERTICES][MAX_VERTICES];
     int i, j, k;
 
-    // Initialize transitiveClosure matrix same as input graph matrix
     for (i = 0; i < V; i++)
         for (j = 0; j < V; j++)
             transitiveClosure[i][j] = graph[i][j];
-
-    // Add direct paths: if a vertex can reach itself
     for (i = 0; i < V; i++)
-        transitiveClosure[i][i] = 1; // Assuming a vertex can always reach itself or based on problem def.
+        transitiveClosure[i][i] = 1; 
 
-    // Pick all vertices as intermediate vertices one by one
     for (k = 0; k < V; k++) {
-        // Pick all vertices as source one by one
         for (i = 0; i < V; i++) {
-            // Pick all vertices as destination for the above picked source
             for (j = 0; j < V; j++) {
-                // If vertex k is on a path from i to j,
-                // then make sure that the value of transitiveClosure[i][j] is 1
                 if (transitiveClosure[i][k] && transitiveClosure[k][j]) {
                     transitiveClosure[i][j] = 1;
                 }
@@ -138,7 +130,7 @@ void warshall(int graph[MAX_VERTICES][MAX_VERTICES], int V) {
         }
     }
 
-    printf("Transitive Closure Matrix:\n");
+    printf("Transitive Closure Matrix:\\n");
     printMatrix(transitiveClosure, V);
 }
 
@@ -146,28 +138,26 @@ int main(void) {
     int V;
     int graph[MAX_VERTICES][MAX_VERTICES];
 
-    printf("Enter the number of vertices (max %d): ", MAX_VERTICES);
+    printf("Enter the number of vertices (max %d): \\n", MAX_VERTICES);
     scanf("%d", &V);
 
     if (V <= 0 || V > MAX_VERTICES) {
-        printf("Invalid number of vertices.\n");
+        printf("Invalid number of vertices.\\n");
         return 1;
     }
 
-    printf("Enter the adjacency matrix (0 or 1) for the graph (%d x %d):\n", V, V);
+    printf("Enter the adjacency matrix (0 or 1) for the graph (%d x %d):\\n", V, V);
     for (int i = 0; i < V; i++) {
         for (int j = 0; j < V; j++) {
             scanf("%d", &graph[i][j]);
         }
     }
     
-    // Ensure diagonal is 1 if self-loops are part of reachability by definition
-    // Or remove this if direct edges in input are the only self-reachability
-    // for (int i = 0; i < V; i++) graph[i][i] = 1;
 
     warshall(graph, V);
 
     return 0;
 }
   `,
+sampleInput: "4\n0 1 0 0\n0 0 0 1\n0 0 0 0\n1 0 1 0",
 };

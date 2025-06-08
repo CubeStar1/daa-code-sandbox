@@ -193,4 +193,5 @@ int main() {
     return 0;
 }
   `,
+sampleInput: "4\n0 10 15 20\n10 0 35 25\n15 35 0 30\n20 25 30 0",
 };

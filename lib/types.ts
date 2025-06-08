@@ -27,14 +27,16 @@ export interface Program {
     space: string
     analysis: string
   }
-  code: string
+  code: string;
+  sampleInput?: string;
 }
 
 export interface ExecutionResult {
-  output: string
-  time?: number
-  memory?: number
-  error?: string
+  output: string;
+  time?: number;
+  memory?: number;
+  error?: string;
+  isRateLimited?: boolean; // To indicate if a 429 rate limit was hit from the API
 }
 
 export interface ExecutionStats {

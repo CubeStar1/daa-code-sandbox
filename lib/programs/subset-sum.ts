@@ -138,10 +138,11 @@ int main(void)
         x[i] = 0;               
     }
 
-    puts("\nSubsets summing to M:");
+    puts("\\nSubsets summing to M:");
     sumSubset(0, 0, total);
 
     return 0;
 }
   `,
+sampleInput: "7\n35\n10\n7\n5\n18\n12\n20\n15",
 };

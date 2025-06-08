@@ -190,4 +190,5 @@ int main() {
     return 0;
 }
   `,
+sampleInput: "Number of tasks/workers (N): 3\nCost Matrix:\n25 10 15\n10 30 5\n20 10 35",
 };

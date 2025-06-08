@@ -101,5 +101,61 @@ Horspool's algorithm is a string searching algorithm that improves upon naive se
 Horspool's is simpler to implement than Boyer-Moore and KMP, and often performs very well in practice, making it a good trade-off between implementation complexity and performance.
     `,
   },
-  code: "#include <stdio.h>\n#include <string.h>\n#include <limits.h>\n\n#define ALPHABET 256\n\nvoid buildShift(const char *pat, int m, int shift[])\n{\n    for (int c = 0; c < ALPHABET; ++c)\n        shift[c] = m;\n\n    for (int i = 0; i < m - 1; ++i)\n        shift[(unsigned char)pat[i]] = m - 1 - i;\n}\n\nint horspool(const char *text, const char *pat)\n{\n    int n = strlen(text);\n    int m = strlen(pat);\n    if (m == 0 || m > n) return -1;\n\n    int shift[ALPHABET];\n    buildShift(pat, m, shift);\n\n    int i = m - 1;\n    while (i < n) {\n        int k = 0;\n        while (k < m && pat[m - 1 - k] == text[i - k])\n            ++k;\n\n        if (k == m)\n            return i - m + 1;\n\n        i += shift[(unsigned char)text[i]];\n    }\n    return -1;\n}\n\nint main(void)\n{\n    char text[200], pat[50];\n    printf(\"Text   : \"); fgets(text, sizeof(text), stdin);\n    printf(\"Pattern: \"); fgets(pat,  sizeof(pat),  stdin);\n\n    text[strcspn(text, \"\\n\")] = pat[strcspn(pat, \"\\n\")] = '\\0';\n\n    int pos = horspool(text, pat);\n    if (pos == -1)\n        puts(\"Pattern NOT found.\");\n    else\n        printf(\"Pattern found at index %d.\\n\", pos);\n\n    return 0;\n}"
+  code: `
+#include <stdio.h>
+#include <string.h>
+#include <limits.h>
+
+#define ALPHABET 256
+
+void buildShift(const char *pat, int m, int shift[])
+{
+    for (int c = 0; c < ALPHABET; ++c)
+        shift[c] = m;
+
+    for (int i = 0; i < m - 1; ++i)
+        shift[(unsigned char)pat[i]] = m - 1 - i;
+}
+
+int horspool(const char *text, const char *pat)
+{
+    int n = strlen(text);
+    int m = strlen(pat);
+    if (m == 0 || m > n) return -1;
+
+    int shift[ALPHABET];
+    buildShift(pat, m, shift);
+
+    int i = m - 1;
+    while (i < n) {
+        int k = 0;
+        while (k < m && pat[m - 1 - k] == text[i - k])
+            ++k;
+
+        if (k == m)
+            return i - m + 1;
+
+        i += shift[(unsigned char)text[i]];
+    }
+    return -1;
+}
+
+int main(void)
+{
+    char text[200], pat[50];
+    printf("Enter the text: \\n");
+    scanf("%s", text);
+    printf("Enter the pattern: \\n");
+    scanf("%s", pat);
+
+    int pos = horspool(text, pat);
+    if (pos == -1)
+        printf("Pattern NOT found.\\n");
+    else
+        printf("Pattern found at index %d.\\n", pos);
+
+    return 0;
+}
+`,
+sampleInput: "AABAACAADAABAABA\nAABA"
 }

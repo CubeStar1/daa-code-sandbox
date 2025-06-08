@@ -111,15 +111,15 @@ int minKey(int key[], bool mstSet[], int V) {
 }
 
 void printMST(int parent[], int graph[MAX_VERTICES][MAX_VERTICES], int V) {
-    printf("Edge   Weight\n");
+    printf("Edge   Weight\\n");
     for (int i = 1; i < V; i++) { 
         if (parent[i] < 0 || parent[i] >= V) {
-            printf("Error: Invalid parent for vertex %d\n", i);
+            printf("Error: Invalid parent for vertex %d\\n", i);
             continue;
         }
          if (graph[i][parent[i]] == 0 && i != parent[i]) {
          }
-        printf("%d - %d    %d \n", parent[i], i, graph[i][parent[i]]);
+        printf("%d - %d    %d \\n", parent[i], i, graph[i][parent[i]]);
     }
 }
 
@@ -140,10 +140,10 @@ void primMST(int graph[MAX_VERTICES][MAX_VERTICES], int V) {
         int u = minKey(key, mstSet, V);
         
         if (u == -1) {
-            if (count < V && V > 0) { // Check if MST is incomplete for a non-empty graph
+            if (count < V && V > 0) { 
                  bool all_in_mst = true;
                  for(int k=0; k<V; ++k) if(!mstSet[k]) all_in_mst = false;
-                 if(!all_in_mst) printf("Graph might be disconnected. MST construction stopped.\n");
+                 if(!all_in_mst) printf("Graph might be disconnected. MST construction stopped.\\n");
             }
             break;
         }
@@ -159,24 +159,23 @@ void primMST(int graph[MAX_VERTICES][MAX_VERTICES], int V) {
         }
     }
 
-    // Print the constructed MST
     printMST(parent, graph, V);
 }
 
 int main(void) {
-    int V; // Number of vertices
+    int V; 
     int graph[MAX_VERTICES][MAX_VERTICES];
 
-    printf("Enter the number of vertices (max %d): ", MAX_VERTICES);
+    printf("Enter the number of vertices (max %d): \\n", MAX_VERTICES);
     scanf("%d", &V);
 
     if (V <= 0 || V > MAX_VERTICES) {
-        printf("Invalid number of vertices.\n");
+        printf("Invalid number of vertices.\\n");
         return 1;
     }
 
-    printf("Enter the adjacency matrix for the graph (%d x %d):\n", V, V);
-    printf("(Use 0 for no direct edge between different vertices, or actual weight. Self-loops are usually 0 or ignored):\n");
+    printf("Enter the adjacency matrix for the graph (%d x %d):\\n", V, V);
+    printf("(Use 0 for no direct edge between different vertices, or actual weight. Self-loops are usually 0 or ignored):\\n");
     for (int i = 0; i < V; i++) {
         for (int j = 0; j < V; j++) {
             scanf("%d", &graph[i][j]);
@@ -188,4 +187,5 @@ int main(void) {
     return 0;
 }
   `,
+sampleInput: "5\n0 2 0 6 0\n2 0 3 8 5\n0 3 0 0 7\n6 8 0 0 9\n0 5 7 9 0",
 };

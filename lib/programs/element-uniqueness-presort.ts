@@ -87,5 +87,48 @@ Therefore, the overall auxiliary space complexity is dominated by the sorting al
 The presorting method provides a good balance with O(n log n) time and potentially low auxiliary space.
     `,
   },
-  code: "#include <stdio.h>\n#include <stdlib.h>\n\nint cmpInt(const void *a, const void *b)\n{\n    int x = *(const int *)a;\n    int y = *(const int *)b;\n    return (x > y) - (x < y);\n}\n\nint main(void)\n{\n    int n;\n    printf(\"How many numbers? \");\n    if (scanf(\"%d\", &n) != 1 || n <= 0) {\n        puts(\"Invalid size!\");\n        return 0;\n    }\n\n    int arr[n];\n    printf(\"Enter %d integers:\\n\", n);\n    for (int i = 0; i < n; ++i) scanf(\"%d\", &arr[i]);\n\n    qsort(arr, n, sizeof(int), cmpInt);\n\n    int unique = 1;\n    for (int i = 1; i < n; ++i) {\n        if (arr[i] == arr[i - 1]) {\n            unique = 0;\n            break;\n        }\n    }\n\n    if (unique)\n        puts(\"All elements are UNIQUE.\");\n    else\n        puts(\"Duplicates FOUND in the array.\");\n\n    return 0;\n}",
+  code: `
+#include <stdio.h>
+#include <stdlib.h>
+
+int cmpInt(const void *a, const void *b)
+{
+    int x = *(const int *)a;
+    int y = *(const int *)b;
+    return (x > y) - (x < y);
 }
+
+int main(void)
+{
+    int n;
+    printf("How many numbers? \\n");
+    if (scanf("%d", &n) != 1 || n <= 0) {
+        printf("Invalid size!\\n");
+        return 0;
+    }
+
+    int arr[n];
+    printf("Enter %d integers:\\n", n);
+    for (int i = 0; i < n; ++i) scanf("%d", &arr[i]);
+
+    qsort(arr, n, sizeof(int), cmpInt);
+
+    int unique = 1;
+    for (int i = 1; i < n; ++i) {
+        if (arr[i] == arr[i - 1]) {
+            unique = 0;
+            break;
+        }
+    }
+
+    if (unique)
+        printf("All elements are UNIQUE.\\n");
+    else
+        printf("Duplicates FOUND in the array.\\n");
+
+    return 0;
+}
+`,
+sampleInput: "5\n10 20 30 40 50"
+}
+
