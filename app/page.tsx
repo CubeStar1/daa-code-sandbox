@@ -129,7 +129,7 @@ export default function CodeSandbox() {
         </div> {/* This was the missing closing div for the header container */}
       </div>
 
-      <div className="flex-1">
+      <div className="flex-1 p-2">
         {isMobileView === undefined ? (
           null // Or a loading spinner/placeholder
         ) : isMobileView ? (
@@ -156,33 +156,33 @@ export default function CodeSandbox() {
           </div>
         ) : (
           // Desktop Layout
-          <ResizablePanelGroup direction="horizontal" className="min-h-[calc(100vh-5rem)] overflow-y-hidden">
+          <ResizablePanelGroup direction="horizontal" className="min-h-[calc(100vh-6rem)] overflow-y-hidden gap-1">
             {/* Left panel - Problem description and complexity analysis */}
-            <ResizablePanel defaultSize={30} minSize={20}>
+            <ResizablePanel defaultSize={30} minSize={20} className="border rounded-lg">
               <div className="h-full">
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col pt-2 px-2">
+                <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col p-1">
                   <TabsList className="grid w-full grid-cols-2 flex-shrink-0">
                     <TabsTrigger value="description">Description</TabsTrigger>
                     <TabsTrigger value="complexity">Complexity</TabsTrigger>
                   </TabsList>
-                  <TabsContent value="description" className="flex-1 mt-0">
+                  <TabsContent value="description" className="flex-1 ">
                     <ProgramDescription program={selectedProgram} />
                   </TabsContent>
-                  <TabsContent value="complexity" className="flex-1 mt-0">
+                  <TabsContent value="complexity" className="flex-1 ">
                     <ComplexityAnalysis program={selectedProgram} />
                   </TabsContent>
                 </Tabs>
               </div>
             </ResizablePanel>
 
-            <ResizableHandle withHandle />
+            <ResizableHandle withHandle className="my-1 bg-background hover:bg-[var(--color-section-splitter)] transition-all"/>
 
             {/* Right panel - Code editor and I/O */}
-            <ResizablePanel defaultSize={70}>
-              <ResizablePanelGroup direction="vertical">
+            <ResizablePanel defaultSize={70} className="">
+              <ResizablePanelGroup direction="vertical" className="gap-1">
                 {/* Code editor */}
-                <ResizablePanel defaultSize={70} minSize={30}>
-                  <div className="h-full p-1">
+                <ResizablePanel defaultSize={70} minSize={30} className="border rounded-lg">
+                  <div className="h-full">
                     <CodeEditor
                       program={selectedProgram}
                       code={code}
@@ -194,11 +194,11 @@ export default function CodeSandbox() {
                   </div>
                 </ResizablePanel>
 
-                <ResizableHandle withHandle />
+                <ResizableHandle withHandle className=" bg-background hover:bg-[var(--color-section-splitter)] transition-all"/>
 
                 {/* Input/Output */}
-                <ResizablePanel defaultSize={30} minSize={20}>
-                  <div className="h-full p-1">
+                <ResizablePanel defaultSize={30} minSize={20} className="border rounded-lg">
+                  <div className="h-full">
                     <InputOutput input={input} onInputChange={setInput} output={output} stats={executionStats} />
                   </div>
                 </ResizablePanel>

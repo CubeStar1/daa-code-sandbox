@@ -1,11 +1,10 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { CodeBlock, CodeBlockCode } from "@/components/ui/code-block"
-import { Copy, Play, Loader2, Eye, Edit, Check } from "lucide-react"
+import { Copy, Play, Loader2, Check } from "lucide-react" // Removed Eye, Edit
 import { useState } from "react"
 import { useTheme } from "next-themes"
-import { Textarea } from "@/components/ui/textarea"
+import Editor from "@monaco-editor/react"; // Added Monaco Editor
 import type { Program } from "@/lib/types"
 
 interface CodeEditorProps {
@@ -18,11 +17,9 @@ interface CodeEditorProps {
 }
 
 export function CodeEditor({ program, code, onCodeChange, onRun, onCopy, isRunning }: CodeEditorProps) {
-  const [isEditing, setIsEditing] = useState(false)
+  // const [isEditing, setIsEditing] = useState(false) // Removed isEditing state
   const [copied, setCopied] = useState(false)
-  const { theme } = useTheme()
-
-  const shikiTheme = theme === "dark" ? "github-dark" : "github-light"
+  const { theme: appTheme } = useTheme() // Renamed to appTheme to avoid potential conflicts
 
   const handleCopy = async () => {
     try {
@@ -43,10 +40,7 @@ export function CodeEditor({ program, code, onCodeChange, onRun, onCopy, isRunni
           <span className="hidden md:block text-sm text-muted-foreground">{program.name.toLowerCase().replace(/\s+/g, "-")}.c</span>
         </div>
         <div className="flex gap-2">
-          <Button variant="outline" size="sm" onClick={() => setIsEditing(!isEditing)}>
-            {isEditing ? <Eye className="h-4 w-4 mr-2" /> : <Edit className="h-4 w-4 mr-2" />}
-            {isEditing ? "Preview" : "Edit"}
-          </Button>
+          {/* Edit/Preview button removed */}
           <Button variant="ghost" size="sm" onClick={handleCopy}>
             {copied ? <Check className="h-4 w-4 mr-2" /> : <Copy className="h-4 w-4 mr-2" />}
             {copied ? "Copied" : "Copy"}
@@ -58,18 +52,20 @@ export function CodeEditor({ program, code, onCodeChange, onRun, onCopy, isRunni
         </div>
       </div>
       <div className="flex-1 overflow-auto">
-        {isEditing ? (
-          <Textarea
-            value={code}
-            onChange={(e) => onCodeChange(e.target.value)}
-            className="font-mono text-sm h-full resize-none border-0 rounded-none focus-visible:ring-0"
-            placeholder="Enter your C code here..."
-          />
-        ) : (
-          <CodeBlock className="h-full border-0 rounded-none">
-            <CodeBlockCode code={code} language="c" theme={shikiTheme} />
-          </CodeBlock>
-        )}
+        <Editor
+          height="100%"
+          language="c"
+          theme={appTheme === "dark" ? "vs-dark" : "vs"}
+          value={code}
+          onChange={(value) => onCodeChange(value || "")}
+          options={{
+            minimap: { enabled: false },
+            fontSize: 14,
+            wordWrap: "on",
+            scrollBeyondLastLine: false,
+            automaticLayout: true, // Ensures editor resizes correctly
+          }}
+        />
       </div>
     </div>
   )
