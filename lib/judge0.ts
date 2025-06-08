@@ -22,7 +22,7 @@ export async function executeCode(code: string, input = "", provider?: 'judge0' 
         console.warn("Rate limit hit when calling /api/execute");
         return {
           output: "",
-          error: "You've made too many requests in a short period. Please wait a moment and try again.",
+          error: "You've made too many requests in a short period. Please wait 60 seconds and try again.",
           isRateLimited: true,
         };
       }

@@ -1,10 +1,12 @@
 "use client"
 
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
+import { cn } from "@/lib/utils"
 import { Badge } from "@/components/ui/badge"
 import type { Program } from "@/lib/types"
 
 interface ProgramSelectorProps {
+  className?: string;
   programs: Program[]
   selectedProgram: Program
   onProgramChange: (programId: string) => void
@@ -25,14 +27,14 @@ const getCategoryColor = (category: string) => {
   return colors[category as keyof typeof colors] || "bg-gray-100 text-gray-800 dark:bg-gray-900 dark:text-gray-200"
 }
 
-export function ProgramSelector({ programs, selectedProgram, onProgramChange }: ProgramSelectorProps) {
+export function ProgramSelector({ programs, selectedProgram, onProgramChange, className }: ProgramSelectorProps) {
   return (
-    <div className="flex items-center gap-4">
+    <div className={cn("flex items-center gap-4", className)}>
       <div className="flex items-center gap-2">
-        <Select value={selectedProgram.id} onValueChange={onProgramChange}>
-          <SelectTrigger className="w-[500px]">
+        <Select value={selectedProgram.id} onValueChange={onProgramChange} >
+          <SelectTrigger className="w-full">
             <SelectValue>
-              <div className="flex items-center gap-2">
+              <div className="flex items-center gap-2 w-full">
                 <span>{selectedProgram.name}</span>
                 <Badge variant="outline" className={`text-xs ${getCategoryColor(selectedProgram.category)}`}>
                   {selectedProgram.category}

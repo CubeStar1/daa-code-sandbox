@@ -33,13 +33,13 @@ export function ProviderInfoPopover() {
             <div className="p-3 bg-muted/50 rounded-md">
               <h5 className="font-medium mb-0.5">OneCompiler</h5>
               <p className="text-sm text-muted-foreground">
-                Generally reliable and suitable for most use cases. 50 submissions/day
+                Generally reliable and suitable for most use cases. 1000 submissions/month
               </p>
             </div>
             <div className="p-3 bg-muted/50 rounded-md">
               <h5 className="font-medium mb-0.5">Judge0</h5>
               <p className="text-sm text-muted-foreground">
-                Can offer faster execution times. May have stricter rate limits. A good alternative if OneCompiler is experiencing issues or is rate-limited. 1000 submissions/month
+                Can offer faster execution times. May have stricter rate limits. A good alternative if OneCompiler is experiencing issues or is rate-limited. 50 submissions/day
               </p>
             </div>
           </div>
