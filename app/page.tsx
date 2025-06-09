@@ -4,16 +4,15 @@ import { useEffect, useState } from "react" // Keep useState for other states
 import { useIsMobile } from "@/hooks/use-mobile"
 import { programs } from "@/lib/programs"
 import { executeCode } from "@/lib/judge0"
-import { ProgramSelector } from "@/components/program-selector"
-import { ProgramDescription } from "@/components/program-description"
-import { ComplexityAnalysis } from "@/components/complexity-analysis"
+import NavbarComponent from "@/components/navbar-component"; 
+// ProgramDescription import removed, handled by ProblemDetailsTabs
+import { ProblemDetailsTabs } from "@/components/problem-details-tabs";
+// ComplexityAnalysis import removed, handled by ProblemDetailsTabs
 import { CodeEditor } from "@/components/code-editor"
 import { InputOutput } from "@/components/input-output"
 import { ThemeToggle } from "@/components/theme-toggle"
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
-import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { ProviderInfoPopover } from "@/components/provider-info-popover";
+// Tabs, TabsContent, TabsList, TabsTrigger removed as they are now encapsulated in ProblemDetailsTabs;
 import { useToast } from "@/components/ui/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import type { Program, ExecutionResult } from "@/lib/types"
@@ -26,7 +25,7 @@ export default function CodeSandbox() {
   const [output, setOutput] = useState("")
   const [isRunning, setIsRunning] = useState(false)
   const [executionStats, setExecutionStats] = useState<{ time?: number; memory?: number }>({})
-  const [activeTab, setActiveTab] = useState("description");
+  // const [activeTab, setActiveTab] = useState("description") // State moved to ProblemDetailsTabs;
   const [executionProvider, setExecutionProvider] = useState<'judge0' | 'onecompiler'>('onecompiler');
   const { toast } = useToast();
 
@@ -80,54 +79,13 @@ export default function CodeSandbox() {
   return (
     <>
     <div className="min-h-screen bg-background flex flex-col">
-      <div className="border-b">
-        <div className="container mx-auto p-3 flex flex-col md:flex-row items-center gap-4">
-          {/* Title Section */}
-          <div className="w-full md:w-auto mb-2 md:mb-0 self-start md:self-center">
-            <h1 className="text-xl font-bold">DAA Lab</h1>
-          </div>
-
-          {/* Centering Group: ProgramSelector and ProviderSelect */}
-          {/* This group takes up the central space on desktop and centers its content */}
-          <div className="w-full md:flex-1 flex flex-col md:flex-row md:justify-center items-center gap-y-2 md:gap-x-4">
-            {/* Program Selector Wrapper */}
-            <div className="w-full md:w-auto mb-2 md:mb-0">
-              <ProgramSelector
-                className="" // ProgramSelector component handles responsive width internally
-                programs={programs}
-                selectedProgram={selectedProgram}
-                onProgramChange={handleProgramChange}
-              />
-            </div>
-
-            {/* Provider Select and Info Popover Group */}
-            <div className="flex items-center gap-2 w-full md:w-auto">
-              <Select 
-                value={executionProvider} 
-                onValueChange={(value) => setExecutionProvider(value as 'judge0' | 'onecompiler')}
-              >
-                <SelectTrigger className="w-full md:w-[10rem]">
-                  <SelectValue placeholder="Select Provider" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="onecompiler">OneCompiler</SelectItem>
-                  <SelectItem value="judge0">Judge0</SelectItem>
-                </SelectContent>
-              </Select>
-              <ProviderInfoPopover />
-              <div className="block md:hidden">
-                <ThemeToggle />
-              </div>
-            </div>
-          </div>
-
-          {/* ThemeToggle Section (Far right on desktop) */}
-          {/* On mobile, this will be full-width and the toggle itself can be aligned (e.g., to the right) */}
-          <div className="hidden md:block w-full md:w-auto mt-2 md:mt-0 md:ml-auto flex justify-end md:justify-start self-center">
-            <ThemeToggle />
-          </div>
-        </div> {/* This was the missing closing div for the header container */}
-      </div>
+      <NavbarComponent 
+        programs={programs}
+        selectedProgram={selectedProgram}
+        onProgramChange={handleProgramChange}
+        executionProvider={executionProvider}
+        onExecutionProviderChange={(value) => setExecutionProvider(value as 'judge0' | 'onecompiler')}
+      />
 
       <div className="flex-1 p-2">
         {isMobileView === undefined ? (
@@ -156,23 +114,10 @@ export default function CodeSandbox() {
           </div>
         ) : (
           // Desktop Layout
-          <ResizablePanelGroup direction="horizontal" className="min-h-[calc(100vh-6rem)] overflow-y-hidden gap-1">
+          <ResizablePanelGroup direction="horizontal" className="min-h-[calc(100vh-5rem)] overflow-y-hidden gap-1">
             {/* Left panel - Problem description and complexity analysis */}
-            <ResizablePanel defaultSize={30} className="border rounded-lg">
-              <div className="h-full">
-                <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col p-2">
-                  <TabsList className="grid w-full grid-cols-2 flex-shrink-0">
-                    <TabsTrigger value="description">Description</TabsTrigger>
-                    <TabsTrigger value="complexity">Complexity</TabsTrigger>
-                  </TabsList>
-                  <TabsContent value="description" className="flex-1 ">
-                    <ProgramDescription program={selectedProgram} />
-                  </TabsContent>
-                  <TabsContent value="complexity" className="flex-1 ">
-                    <ComplexityAnalysis program={selectedProgram} />
-                  </TabsContent>
-                </Tabs>
-              </div>
+            <ResizablePanel defaultSize={30} className="p-1">
+              <ProblemDetailsTabs program={selectedProgram} />
             </ResizablePanel>
 
             <ResizableHandle withHandle className="my-1 bg-background hover:bg-[var(--color-section-splitter)] transition-all"/>

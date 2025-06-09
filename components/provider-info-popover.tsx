@@ -7,8 +7,17 @@ import {
 } from "@/components/ui/popover";
 import { Button } from "@/components/ui/button";
 import { Info } from "lucide-react";
+import { ExecutionProviderSelector } from "./execution-provider-selector"; // Added
 
-export function ProviderInfoPopover() {
+interface ProviderInfoPopoverProps { // Added
+  executionProvider: 'judge0' | 'onecompiler';
+  onExecutionProviderChange: (value: 'judge0' | 'onecompiler') => void;
+}
+
+export function ProviderInfoPopover({ // Added
+  executionProvider,
+  onExecutionProviderChange
+}: ProviderInfoPopoverProps) {
   return (
     <Popover>
       <PopoverTrigger asChild>
@@ -19,10 +28,21 @@ export function ProviderInfoPopover() {
       <PopoverContent className="w-96 p-6 shadow-xl rounded-lg" side="bottom" align="start">
         <div className="space-y-4">
           <div>
-            <h4 className="font-semibold text-lg leading-tight mb-1">
-              Execution Providers
+            <h4 className="font-semibold text-lg leading-tight mb-2">
+              Execution Provider
             </h4>
-            <div className="flex items-center gap-2 bg-red-500 px-2 py-1 rounded text-white">
+            <ExecutionProviderSelector 
+              executionProvider={executionProvider}
+              onExecutionProviderChange={onExecutionProviderChange}
+              className="bg-neutral-800 border-neutral-700 text-neutral-200 data-[state=open]:ring-neutral-700 data-[state=open]:border-neutral-600"
+            />
+          </div>
+          {/* Original content about providers can remain below or be adjusted */}
+          <div className="mt-4">
+            <h4 className="font-semibold text-lg leading-tight mb-1">
+              About Providers
+            </h4>
+            <div className="flex items-center gap-2 bg-red-500 px-2 py-1 rounded-md text-white">
               <strong>Rate Limit:</strong> 1 submission/minute
             </div>
           </div>

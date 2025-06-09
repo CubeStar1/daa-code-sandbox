@@ -1,6 +1,6 @@
 "use client"
 
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
+import { CardTitle } from "@/components/ui/card"; // Card, CardContent, CardHeader removed
 import { ScrollArea } from "@/components/ui/scroll-area"
 import { Badge } from "@/components/ui/badge"
 import type { Program } from "@/lib/types"
@@ -26,61 +26,57 @@ interface ProgramDescriptionProps {
 
 export function ProgramDescription({ program }: ProgramDescriptionProps) {
   return (
-    <Card className="h-full border-0 shadow-none flex flex-col">
-      <CardHeader className="flex-shrink-0 px-4">
-        <div className="flex items-center justify-between">
-          <CardTitle className="text-xl">{program.name}</CardTitle>
-          <Badge variant="outline" className={getCategoryColor(program.category)}>
-            {program.category}
-          </Badge>
-        </div>
-      </CardHeader>
-      <CardContent className="flex-1 px-4 py-0">
-        <ScrollArea className="h-[calc(100vh-16rem)]">
-          <div className="space-y-4 pr-4">
-            <div className="text-muted-foreground">{program.description}</div>
+    <div className="h-full p-4">
+      <div className="mb-4">
+        <h2 className="text-xl font-semibold">{program.name}</h2>
+        <Badge variant="outline" className={getCategoryColor(program.category)}>{program.category}</Badge>
+      </div>
+     
+      
+      <ScrollArea className="h-[calc(100vh-17rem)] pr-2">
+        <div className="space-y-4">
+          <div className="text-muted-foreground text-sm">{program.description}</div>
 
-            <div className="space-y-4">
-              <div>
+          <div className="space-y-6">
+            <div>
                 <h3 className="text-sm font-medium mb-2">Examples:</h3>
-                <div className="space-y-3">
-                  {program.examples.map((example, index) => (
+              <div className="space-y-3">
+                {program.examples.map((example, index) => (
                     <div key={index} className="bg-muted p-3 rounded-md">
                       <div className="text-sm font-mono mb-2">
-                        <div>
-                          <strong>Input:</strong> {example.input.replace(/\n/g, " ")}
-                        </div>
-                        <div>
-                          <strong>Output:</strong> {example.output}
-                        </div>
+                      <div>
+                        <strong>Input:</strong> {example.input.replace(/\n/g, " ")}
                       </div>
-                      <div className="text-xs text-muted-foreground">{example.explanation}</div>
+                      <div>
+                        <strong>Output:</strong> {example.output}
+                      </div>
                     </div>
-                  ))}
-                </div>
-              </div>
-
-              <div>
-                <h3 className="text-sm font-medium mb-2">Algorithm Steps:</h3>
-                <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
-                  {program.algorithmSteps.map((step, index) => (
-                    <li key={index}>{step}</li>
-                  ))}
-                </ol>
-              </div>
-
-              <div>
-                <h3 className="text-sm font-medium mb-2">Key Properties:</h3>
-                <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
-                  {program.keyProperties.map((property, index) => (
-                    <li key={index}>{property}</li>
-                  ))}
-                </ul>
+                      <div className="text-xs text-muted-foreground">{example.explanation}</div>
+                  </div>
+                ))}
               </div>
             </div>
+
+            <div>
+                <h3 className="text-sm font-medium mb-2">Algorithm Steps:</h3>
+                <ol className="text-sm text-muted-foreground space-y-1 list-decimal list-inside">
+                {program.algorithmSteps.map((step, index) => (
+                  <li key={index}>{step}</li>
+                ))}
+              </ol>
+            </div>
+
+            <div>
+                <h3 className="text-sm font-medium mb-2">Key Properties:</h3>
+                <ul className="text-sm text-muted-foreground space-y-1 list-disc list-inside">
+                {program.keyProperties.map((property, index) => (
+                  <li key={index}>{property}</li>
+                ))}
+              </ul>
+            </div>
           </div>
-        </ScrollArea>
-      </CardContent>
-    </Card>
-  )
+        </div>
+      </ScrollArea>
+    </div>
+  );
 }

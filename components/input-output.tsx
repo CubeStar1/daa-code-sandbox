@@ -23,9 +23,9 @@ export function InputOutput({ input, onInputChange, output, stats }: InputOutput
   }, [output]);
 
   return (
-    <div className="h-full flex flex-col">
+    <div className="h-full flex flex-col bg-card rounded-lg overflow-hidden">
       <Tabs value={activeTab} onValueChange={setActiveTab} className="h-full flex flex-col">
-        <div className="flex items-center justify-between border-b p-2">
+        <div className="flex items-center justify-between border-b border-border p-2 dark:bg-[#333333]">
           <TabsList>
             <TabsTrigger value="input">Input</TabsTrigger>
             <TabsTrigger value="output">Output</TabsTrigger>
@@ -41,14 +41,12 @@ export function InputOutput({ input, onInputChange, output, stats }: InputOutput
           <Textarea
             value={input}
             onChange={(e) => onInputChange(e.target.value)}
-            className="font-mono text-sm h-full resize-none border-0 rounded-none focus-visible:ring-0"
+            className="font-mono text-sm h-full resize-none border-0 rounded-none focus-visible:ring-0 bg-card"
             placeholder="Enter input for your program (if needed)..."
           />
         </TabsContent>
-        <TabsContent value="output" className="flex-1 p-2 mt-0 overflow-y-auto">
-          <div className="bg-muted/80 shadow-md font-mono text-sm p-4 rounded-md">
-            <pre className="whitespace-pre-wrap">{output || 'Click "Run" to execute your code...'}</pre>
-          </div>
+        <TabsContent value="output" className="flex-1 p-0 mt-0 overflow-y-auto">
+          <pre className="whitespace-pre-wrap font-mono text-sm p-4 h-full">{output || 'Click "Run" to execute your code...'}</pre>
         </TabsContent>
       </Tabs>
     </div>
