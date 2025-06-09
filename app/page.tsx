@@ -116,7 +116,7 @@ export default function CodeSandbox() {
           // Desktop Layout
           <ResizablePanelGroup direction="horizontal" className="min-h-[calc(100vh-5rem)] overflow-y-hidden gap-1">
             {/* Left panel - Problem description and complexity analysis */}
-            <ResizablePanel defaultSize={30} className="p-1">
+            <ResizablePanel defaultSize={30} className="border rounded-lg">
               <ProblemDetailsTabs program={selectedProgram} />
             </ResizablePanel>
 
