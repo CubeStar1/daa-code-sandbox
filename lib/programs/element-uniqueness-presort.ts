@@ -87,7 +87,8 @@ Therefore, the overall auxiliary space complexity is dominated by the sorting al
 The presorting method provides a good balance with O(n log n) time and potentially low auxiliary space.
     `,
   },
-  code: `
+  code: {
+    c: `
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -129,6 +130,46 @@ int main(void)
     return 0;
 }
 `,
-sampleInput: "5\n10 20 30 40 50"
+    cpp: `
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    cout << "How many numbers? " << endl;
+    cin >> n;
+
+    if (n <= 0) {
+        cout << "Invalid size!" << endl;
+        return 1;
+    }
+
+    vector<int> arr(n);
+    cout << "Enter " << n << " integers:" << endl;
+    for (int i = 0; i < n; ++i) {
+        cin >> arr[i];
+    }
+
+    sort(arr.begin(), arr.end());
+
+    bool unique = true;
+    for (int i = 1; i < n; ++i) {
+        if (arr[i] == arr[i - 1]) {
+            unique = false;
+            break;
+        }
+    }
+
+    if (unique) {
+        cout << "All elements are UNIQUE." << endl;
+    } else {
+        cout << "Duplicates FOUND in the array." << endl;
+    }
+
+    return 0;
+}
+`
+  },
+  sampleInput: "5\n10 20 30 40 50"
 }
 

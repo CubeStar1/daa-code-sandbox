@@ -73,7 +73,8 @@ Thus, the time complexity is exponential, O(2^n), as each disk added roughly dou
 The space complexity is determined by the maximum depth of the recursion stack. Since the function calls itself for n-1 disks, the maximum depth of the stack will be n. Therefore, the space complexity is O(n).
     `,
   },
-  code: `
+  code: {
+    c: `
 #include <stdio.h>
 
 void hanoi(int n, char src, char aux, char dest)
@@ -96,6 +97,28 @@ int main(void)
     return 0;
 }
 `,
-sampleInput: "3"
+    cpp: `
+#include <bits/stdc++.h>
+using namespace std;
+
+void hanoi(int n, char src, char aux, char dest) {
+    if (n == 0) return;
+
+    hanoi(n - 1, src, dest, aux);
+    cout << "Move disk " << n << " from " << src << " -> " << dest << endl;
+    hanoi(n - 1, aux, src, dest);
+}
+
+int main() {
+    int disks;
+    cout << "Enter number of disks for Tower of Hanoi: " << endl;
+    cin >> disks;
+    cout << "Steps to solve Tower of Hanoi with " << disks << " disks:" << endl;
+    hanoi(disks, 'A', 'B', 'C');
+    return 0;
+}
+`
+  },
+  sampleInput: "3"
 }
 

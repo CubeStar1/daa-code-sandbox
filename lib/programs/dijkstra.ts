@@ -92,7 +92,8 @@ If an adjacency list were used, it would be O(V+E).
 (V = number of vertices, E = number of edges)
     `,
   },
-  code: `
+  code: {
+    c: `
 #include <stdio.h>
 #include <limits.h> 
 #include <stdbool.h> 
@@ -187,5 +188,99 @@ int main(void) {
     return 0;
 }
   `,
-sampleInput: "9\n0 4 0 0 0 0 0 8 0\n4 0 8 0 0 0 0 11 0\n0 8 0 7 0 4 0 0 2\n0 0 7 0 9 14 0 0 0\n0 0 0 9 0 10 0 0 0\n0 0 4 14 10 0 2 0 0\n0 0 0 0 0 2 0 1 6\n8 11 0 0 0 0 1 0 7\n0 0 2 0 0 0 6 7 0\n0",
+    cpp: `
+#include <bits/stdc++.h>
+using namespace std;
+
+#define INF INT_MAX
+
+int minDistance(const vector<int>& dist, const vector<bool>& sptSet, int V) {
+    int min = INF, min_index = -1;
+
+    for (int v = 0; v < V; v++) {
+        if (sptSet[v] == false && dist[v] <= min) {
+            min = dist[v];
+            min_index = v;
+        }
+    }
+    return min_index;
+}
+
+void printSolution(const vector<int>& dist, int V, int src) {
+    cout << "Vertex   Distance from Source " << src << endl;
+    for (int i = 0; i < V; i++) {
+        if (dist[i] == INF) {
+            cout << i << " \t\t " << "INF" << endl;
+        } else {
+            cout << i << " \t\t " << dist[i] << endl;
+        }
+    }
+}
+
+void dijkstra(const vector<vector<int>>& graph, int src, int V) {
+    vector<int> dist(V);
+    vector<bool> sptSet(V);
+
+    for (int i = 0; i < V; i++) {
+        dist[i] = INF;
+        sptSet[i] = false;
+    }
+
+    dist[src] = 0;
+
+    for (int count = 0; count < V - 1; count++) {
+        int u = minDistance(dist, sptSet, V);
+        
+        if (u == -1) break;
+
+        sptSet[u] = true;
+
+        for (int v = 0; v < V; v++) {
+            if (!sptSet[v] && graph[u][v] && dist[u] != INF &&
+                dist[u] + graph[u][v] < dist[v]) {
+                dist[v] = dist[u] + graph[u][v];
+            }
+        }
+    }
+
+    printSolution(dist, V, src);
+}
+
+int main() {
+    int V;
+    int src_vertex;
+
+    cout << "Enter the number of vertices: " << endl;
+    cin >> V;
+
+    if (V <= 0) {
+        cout << "Invalid number of vertices." << endl;
+        return 1;
+    }
+
+    vector<vector<int>> graph(V, vector<int>(V));
+    cout << "Enter the adjacency matrix for the graph (" << V << " x " << V << "):" << endl;
+    cout << "(Use " << 99999 << " for infinity/no direct path, 0 for self-loops if no weight):" << endl;
+    for (int i = 0; i < V; i++) {
+        for (int j = 0; j < V; j++) {
+            cin >> graph[i][j];
+            if(graph[i][j] == 99999) graph[i][j] = INF;
+        }
+    }
+
+    cout << "Enter the source vertex (0 to " << V - 1 << "): " << endl;
+    cin >> src_vertex;
+
+    if (src_vertex < 0 || src_vertex >= V) {
+        cout << "Invalid source vertex." << endl;
+        return 1;
+    }
+
+    dijkstra(graph, src_vertex, V);
+
+    return 0;
+}
+`
+  },
+  sampleInput: "9\n0 4 0 0 0 0 0 8 0\n4 0 8 0 0 0 0 11 0\n0 8 0 7 0 4 0 0 2\n0 0 7 0 9 14 0 0 0\n0 0 0 9 0 10 0 0 0\n0 0 4 14 10 0 2 0 0\n0 0 0 0 0 2 0 1 6\n8 11 0 0 0 0 1 0 7\n0 0 2 0 0 0 6 7 0\n0",
 };

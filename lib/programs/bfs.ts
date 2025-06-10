@@ -95,7 +95,8 @@ The dominant factor is O(V).
     `,
   },
   sampleInput: "7\n8\n0 1\n0 2\n1 3\n1 4\n2 5\n2 6\n3 4\n5 6\n0",
-  code: `
+  code: {
+    c: `
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -233,5 +234,81 @@ int main() {
     free(graph);
     return 0;
 }
-`
+`,
+    cpp: `
+#include <bits/stdc++.h>
+using namespace std;
+
+class Graph {
+    int V;
+    vector<vector<int>> adj;
+
+public:
+    Graph(int V) : V(V), adj(V) {}
+
+    void addEdge(int v, int w) {
+        adj[v].push_back(w);
+        adj[w].push_back(v); // For undirected graph
+    }
+
+    void BFS(int s) {
+        vector<bool> visited(V, false);
+        queue<int> q;
+
+        visited[s] = true;
+        q.push(s);
+
+        cout << "Breadth First Traversal (starting from vertex " << s << "):" << endl;
+
+        while (!q.empty()) {
+            s = q.front();
+            cout << s << " ";
+            q.pop();
+
+            for (int adjacent : adj[s]) {
+                if (!visited[adjacent]) {
+                    visited[adjacent] = true;
+                    q.push(adjacent);
+                }
+            }
+        }
+        cout << endl;
+    }
+};
+
+int main() {
+    int V, E, startNode;
+    cout << "Enter the number of vertices: ";
+    cin >> V;
+
+    if (V <= 0) {
+        cout << "Invalid number of vertices." << endl;
+        return 1;
+    }
+
+    Graph g(V);
+
+    cout << "Enter the number of edges: ";
+    cin >> E;
+
+    cout << "Enter the edges (format: u v):" << endl;
+    for (int i = 0; i < E; ++i) {
+        int u, v;
+        cin >> u >> v;
+        g.addEdge(u, v);
+    }
+
+    cout << "Enter the starting vertex for BFS: ";
+    cin >> startNode;
+
+    if (startNode >= 0 && startNode < V) {
+        g.BFS(startNode);
+    } else {
+        std::cout << "Invalid starting vertex." << std::endl;
+    }
+
+    return 0;
+}
+`,
+    },
 }

@@ -83,7 +83,8 @@ Branch and Bound for TSP explores a state-space tree. The root represents the st
 - Overall practical space is often dominated by O(N^2).
     `,
   },
-  code: `
+  code: {
+    c: `
 #include <stdio.h>
 #include <limits.h>
 #include <stdbool.h>
@@ -104,19 +105,6 @@ void copyToFinal(int curr_path[]) {
         final_path_tsp[i] = curr_path[i];
     }
     final_path_tsp[n_tsp] = curr_path[0];
-}
-
-int calculateLowerBound(int curr_cost, int level, int curr_path[]) {
-    int bound = curr_cost;
-    bool temp_visited[MAX_N];
-    memcpy(temp_visited, visited_tsp, n_tsp * sizeof(bool));
-
-    for (int i = 0; i < n_tsp; i++) {
-        if (!temp_visited[i]) {
-            int min_edge = INF;
-        }
-    }
-    return bound; 
 }
 
 void TSP_recursion(int curr_node, int level, int curr_cost, int curr_path[]) {
@@ -160,8 +148,6 @@ int main() {
     for (int i = 0; i < n_tsp; i++) {
         for (int j = 0; j < n_tsp; j++) {
             scanf("%d", &cost_matrix_tsp[i][j]);
-            if (cost_matrix_tsp[i][j] == 0 && i != j) {
-            }
             if (cost_matrix_tsp[i][j] == 99999) cost_matrix_tsp[i][j] = INF;
         }
     }
@@ -193,5 +179,94 @@ int main() {
     return 0;
 }
   `,
-sampleInput: "4\n0 10 15 20\n10 0 35 25\n15 35 0 30\n20 25 30 0",
+    cpp: `
+#include <bits/stdc++.h>
+using namespace std;
+
+const int INF = numeric_limits<int>::max();
+int n_tsp;
+vector<vector<int>> cost_matrix_tsp;
+vector<int> final_path_tsp;
+vector<bool> visited_tsp;
+int min_tsp_cost = INF;
+
+void copyToFinal(const vector<int>& curr_path) {
+    final_path_tsp = curr_path;
+    final_path_tsp.push_back(curr_path[0]);
+}
+
+void TSP_recursion(int curr_node, int level, int curr_cost, vector<int>& curr_path) {
+    if (level == n_tsp) {
+        if (cost_matrix_tsp[curr_node][curr_path[0]] != 0 && cost_matrix_tsp[curr_node][curr_path[0]] != INF) {
+            int total_cost = curr_cost + cost_matrix_tsp[curr_node][curr_path[0]];
+            if (total_cost < min_tsp_cost) {
+                min_tsp_cost = total_cost;
+                copyToFinal(curr_path);
+            }
+        }
+        return;
+    }
+
+    for (int next_node = 0; next_node < n_tsp; next_node++) {
+        if (!visited_tsp[next_node] && cost_matrix_tsp[curr_node][next_node] != 0 && cost_matrix_tsp[curr_node][next_node] != INF) {
+            if (curr_cost + cost_matrix_tsp[curr_node][next_node] >= min_tsp_cost) {
+                continue;
+            }
+
+            visited_tsp[next_node] = true;
+            curr_path[level] = next_node;
+            TSP_recursion(next_node, level + 1, curr_cost + cost_matrix_tsp[curr_node][next_node], curr_path);
+            
+            visited_tsp[next_node] = false;
+            curr_path[level] = -1; // Backtrack path
+        }
+    }
+}
+
+int main() {
+    cout << "Enter the number of cities: ";
+    cin >> n_tsp;
+
+    if (n_tsp <= 0) {
+        cout << "Invalid number of cities." << endl;
+        return 1;
+    }
+
+    cout << "Enter the cost matrix (" << n_tsp << " x " << n_tsp << "):" << endl;
+    cout << "(Use 0 for same city, or a large number like 99999 for no direct path/infinity):" << endl;
+    cost_matrix_tsp.assign(n_tsp, vector<int>(n_tsp));
+    for (int i = 0; i < n_tsp; i++) {
+        for (int j = 0; j < n_tsp; j++) {
+            cin >> cost_matrix_tsp[i][j];
+            if (cost_matrix_tsp[i][j] == 99999) {
+                cost_matrix_tsp[i][j] = INF;
+            }
+        }
+    }
+
+    visited_tsp.assign(n_tsp, false);
+    vector<int> initial_path(n_tsp, -1);
+
+    visited_tsp[0] = true;
+    initial_path[0] = 0;
+    min_tsp_cost = INF;
+
+    TSP_recursion(0, 1, 0, initial_path);
+
+    if (min_tsp_cost == INF) {
+        cout << "No Hamiltonian cycle found or error in input." << endl;
+    } else {
+        cout << "Minimum cost of the TSP tour: " << min_tsp_cost << endl;
+        cout << "Path: ";
+        for (int i = 0; i < final_path_tsp.size(); i++) {
+            cout << final_path_tsp[i] << (i == final_path_tsp.size() - 1 ? "" : " -> ");
+        }
+        cout << endl;
+    }
+
+    return 0;
+}
+`
+  },
+  sampleInput: "4\n0 10 15 20\n10 0 35 25\n15 35 0 30\n20 25 30 0",
 };

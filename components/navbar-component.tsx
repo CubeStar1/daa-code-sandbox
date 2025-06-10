@@ -6,6 +6,9 @@ import { ProviderInfoPopover } from "@/components/provider-info-popover";
 import { ThemeToggle } from "@/components/theme-toggle";
 import TimerComponent from "@/components/timer-component"; // Adjusted path
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
+import { Button } from "@/components/ui/button";
+import { ChevronLeft, ChevronRight, Shuffle } from 'lucide-react';
 import type { Program } from "@/lib/types";
 import Image from "next/image";
 
@@ -13,6 +16,9 @@ interface NavbarComponentProps {
   programs: Program[];
   selectedProgram: Program;
   onProgramChange: (programId: string) => void;
+  onNextProgram: () => void;
+  onPreviousProgram: () => void;
+  onRandomProgram: () => void;
   executionProvider: 'judge0' | 'onecompiler';
   onExecutionProviderChange: (value: 'judge0' | 'onecompiler') => void;
 }
@@ -21,14 +27,17 @@ const NavbarComponent: React.FC<NavbarComponentProps> = ({
   programs,
   selectedProgram,
   onProgramChange,
+  onNextProgram,
+  onPreviousProgram,
+  onRandomProgram,
   executionProvider,
   onExecutionProviderChange
 }) => {
   return (
     <div className="bg-background sticky top-0 z-50">
-      <div className="mx-2 pt-2 flex flex-col md:flex-row items-center gap-4">
+            <div className="mx-2 pt-2 flex flex-row items-center gap-4">
         {/* Title Section */}
-        <div className="w-full md:w-auto mb-2 md:mb-0 self-start md:self-center">
+        <div className="w-auto self-center">
           <div className="flex items-center gap-2">
             <Image src="code-sandbox-logo.png" alt="CodeSandbox Logo" width={30} height={50} />
             <h1 className="text-xl font-bold">DAA Lab</h1>
@@ -36,9 +45,43 @@ const NavbarComponent: React.FC<NavbarComponentProps> = ({
         </div>
 
         {/* Centering Group: ProgramSelector and ProviderSelect */}
-        <div className="w-full md:flex-1 flex flex-col md:flex-row md:justify-center items-center gap-y-2 md:gap-x-4">
+        <div className="flex-1 flex flex-row justify-center items-center gap-x-4">
           {/* Program Selector Wrapper */}
-          <div className="w-full md:w-auto mb-2 md:mb-0">
+          <div className="w-auto flex items-center">
+            <TooltipProvider>
+              <div className="flex items-center mr-2 gap-1">
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" onClick={onPreviousProgram}>
+                      <ChevronLeft className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Previous Question (Ctrl + ←)</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" onClick={onNextProgram}>
+                      <ChevronRight className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Next Question (Ctrl + →)</p>
+                  </TooltipContent>
+                </Tooltip>
+                <Tooltip>
+                  <TooltipTrigger asChild>
+                    <Button variant="ghost" size="icon" onClick={onRandomProgram}>
+                      <Shuffle className="h-4 w-4" />
+                    </Button>
+                  </TooltipTrigger>
+                  <TooltipContent>
+                    <p>Random Question (Ctrl + R)</p>
+                  </TooltipContent>
+                </Tooltip>
+              </div>
+            </TooltipProvider>
             <ProgramSelector
               className="" // ProgramSelector component handles responsive width internally
               programs={programs}
@@ -48,23 +91,20 @@ const NavbarComponent: React.FC<NavbarComponentProps> = ({
           </div>
 
           {/* Provider Info Popover (now includes Provider Select) and Timer Group */}
-          <div className="flex items-center gap-2 w-full md:w-auto">
+          <div className="flex items-center gap-2">
             <ProviderInfoPopover 
               executionProvider={executionProvider}
               onExecutionProviderChange={onExecutionProviderChange}
             />
             {/* Timer Component Integration */}
-            <div className="hidden md:flex items-center">
+            <div className="flex items-center">
                 <TimerComponent />
-            </div>
-            <div className="block md:hidden ml-auto">
-              <ThemeToggle />
             </div>
           </div>
         </div>
 
         {/* ThemeToggle Section (Far right on desktop) & Timer for mobile */}
-        <div className="hidden md:flex w-full md:w-auto mt-2 md:mt-0 md:ml-auto items-center justify-end md:justify-start self-center gap-2">
+        <div className="w-auto ml-auto flex items-center justify-end self-center gap-2">
           <ThemeToggle />
         </div>
       </div>

@@ -103,7 +103,8 @@ The Boyer-Moore algorithm is renowned for its efficiency in string searching. It
 -   However, Boyer-Moore's preprocessing, particularly for the good-suffix rule, is more complex to implement correctly than Horspool's simpler shift table.
     `,
   },
-  code: `
+  code: {
+    c: `
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
@@ -189,5 +190,103 @@ int main(void) {
     return 0;
 }
 `,
+    cpp: `
+#include <bits/stdc++.h>
+using namespace std;
+
+const int ALPHABET_SIZE = 256;
+
+void badCharHeuristic(const string& pattern, vector<int>& badchar) {
+    badchar.assign(ALPHABET_SIZE, -1);
+    for (size_t i = 0; i < pattern.length(); ++i) {
+        badchar[static_cast<unsigned char>(pattern[i])] = i;
+    }
+}
+
+void goodSuffixHeuristic(const string& pattern, vector<int>& borderPos, vector<int>& shift) {
+    int m = pattern.length();
+    int i = m, j = m + 1;
+    borderPos[i] = j;
+
+    while (i > 0) {
+        while (j <= m && pattern[i - 1] != pattern[j - 1]) {
+            if (shift[j] == 0) {
+                shift[j] = j - i;
+            }
+            j = borderPos[j];
+        }
+        i--;
+        j--;
+        borderPos[i] = j;
+    }
+
+    j = borderPos[0];
+    for (i = 0; i <= m; i++) {
+        if (shift[i] == 0) {
+            shift[i] = j;
+        }
+        if (i == j) {
+            j = borderPos[j];
+        }
+    }
+}
+
+int boyerMoore(const string& text, const string& pattern) {
+    int m = pattern.length();
+    int n = text.length();
+    if (m == 0 || m > n) return -1;
+
+    vector<int> badchar(ALPHABET_SIZE);
+    vector<int> borderPos(m + 1);
+    vector<int> goodSuffixShift(m + 1, 0);
+
+    badCharHeuristic(pattern, badchar);
+    goodSuffixHeuristic(pattern, borderPos, goodSuffixShift);
+
+    int s = 0;
+    while (s <= n - m) {
+        int j = m - 1;
+        while (j >= 0 && pattern[j] == text[s + j]) {
+            j--;
+        }
+
+        if (j < 0) {
+            return s; 
+        } else {
+            int bc_shift = max(1, j - badchar[static_cast<unsigned char>(text[s + j])]);
+            int gs_shift = goodSuffixShift[j + 1];
+            s += max(bc_shift, gs_shift);
+        }
+    }
+    return -1;
+}
+
+int main() {
+    string text, pattern;
+    cout << "Enter the text: " << endl;
+    getline(cin, text);
+    cout << "Enter the pattern: " << endl;
+    getline(cin, pattern);
+
+    // The example inputs are not line-based, so we extract them.
+    size_t text_pos = text.find(":");
+    if (text_pos != string::npos) {
+        text = text.substr(text_pos + 2);
+    }
+    size_t pat_pos = pattern.find(":");
+    if (pat_pos != string::npos) {
+        pattern = pattern.substr(pat_pos + 2);
+    }
+
+    int pos = boyerMoore(text, pattern);
+    if (pos == -1) {
+        cout << "Pattern NOT found." << endl;
+    } else {
+        cout << "Pattern found at index " << pos << "." << endl;
+    }
+    return 0;
+}
+`
+  },
   sampleInput: "ABABDABACDABABCABAB\nABABCABAB"
 }

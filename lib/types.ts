@@ -27,7 +27,10 @@ export interface Program {
     space: string
     analysis: string
   }
-  code: string;
+  code: {
+    c: string;
+    cpp: string;
+  };
   sampleInput?: string;
 }
 

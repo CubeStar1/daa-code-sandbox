@@ -95,7 +95,8 @@ Thus, the total number of times the constant time operation inside the loops is 
 Warshall's algorithm is straightforward but not the most efficient for very large sparse graphs where other algorithms might perform better for specific tasks like single-source reachability. However, for all-pairs reachability on dense graphs, its O(V³) complexity is standard for this type of problem solved via matrix operations.
     `,
   },
-  code: `
+  code: {
+    c: `
 #include <stdio.h>
 #include <stdbool.h>
 
@@ -159,5 +160,64 @@ int main(void) {
     return 0;
 }
   `,
-sampleInput: "4\n0 1 0 0\n0 0 0 1\n0 0 0 0\n1 0 1 0",
+    cpp: `
+#include <bits/stdc++.h>
+using namespace std;
+
+void printMatrix(const vector<vector<int>>& matrix) {
+    for (const auto& row : matrix) {
+        for (int val : row) {
+            cout << val << " ";
+        }
+        cout << endl;
+    }
+}
+
+void warshall(vector<vector<int>>& graph) {
+    int V = graph.size();
+    vector<vector<int>> transitiveClosure = graph;
+
+    for (int i = 0; i < V; i++) {
+        transitiveClosure[i][i] = 1;
+    }
+
+    for (int k = 0; k < V; k++) {
+        for (int i = 0; i < V; i++) {
+            for (int j = 0; j < V; j++) {
+                if (transitiveClosure[i][k] && transitiveClosure[k][j]) {
+                    transitiveClosure[i][j] = 1;
+                }
+            }
+        }
+    }
+
+    cout << "Transitive Closure Matrix:" << endl;
+    printMatrix(transitiveClosure);
+}
+
+int main() {
+    int V;
+    cout << "Enter the number of vertices: " << endl;
+    cin >> V;
+
+    if (V <= 0) {
+        cout << "Invalid number of vertices." << endl;
+        return 1;
+    }
+
+    vector<vector<int>> graph(V, vector<int>(V));
+    cout << "Enter the adjacency matrix (0 or 1) for the graph (" << V << " x " << V << "):" << endl;
+    for (int i = 0; i < V; i++) {
+        for (int j = 0; j < V; j++) {
+            cin >> graph[i][j];
+        }
+    }
+
+    warshall(graph);
+
+    return 0;
+}
+`
+  },
+  sampleInput: "4\n0 1 0 0\n0 0 0 1\n0 0 0 0\n1 0 1 0",
 };

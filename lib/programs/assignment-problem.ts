@@ -82,7 +82,8 @@ The Branch and Bound approach explores a state-space tree where each level repre
 - Overall space complexity is typically dominated by O(N^2).
     `,
   },
-  code: `
+  code: {
+    c: `
 #include <stdio.h>
 #include <stdbool.h>
 #include <limits.h>
@@ -98,6 +99,7 @@ int final_assignment_ap[MAX_N];
 bool task_assigned_ap[MAX_N];
 int min_total_cost_ap = INF;
 
+// This function is provided for context but not used in the final recursive solution below.
 int calculate_lower_bound_ap(int worker_idx, int current_path_cost) {
     int bound = current_path_cost;
     for (int w = worker_idx; w < n_ap; w++) {
@@ -189,6 +191,87 @@ int main() {
 
     return 0;
 }
-  `,
+`,
+    cpp: `
+#include <bits/stdc++.h>
+using namespace std;
+
+#define INF INT_MAX
+
+int n_ap;
+vector<vector<int>> cost_matrix_ap;
+vector<int> current_assignment_ap;
+vector<int> final_assignment_ap;
+vector<bool> task_assigned_ap;
+int min_total_cost_ap = INF;
+
+void solve_assignment_recursive(int worker_idx, int current_path_cost) {
+    if (worker_idx == n_ap) {
+        if (current_path_cost < min_total_cost_ap) {
+            min_total_cost_ap = current_path_cost;
+            final_assignment_ap = current_assignment_ap;
+        }
+        return;
+    }
+
+    if (current_path_cost >= min_total_cost_ap) {
+        return;
+    }
+
+    for (int task_idx = 0; task_idx < n_ap; task_idx++) {
+        if (!task_assigned_ap[task_idx]) {
+            task_assigned_ap[task_idx] = true;
+            current_assignment_ap[worker_idx] = task_idx;
+            
+            int new_cost = current_path_cost + cost_matrix_ap[worker_idx][task_idx];
+
+            if (new_cost < min_total_cost_ap) {
+                 solve_assignment_recursive(worker_idx + 1, new_cost);
+            }
+
+            task_assigned_ap[task_idx] = false;
+        }
+    }
+}
+
+int main() {
+    cout << "Enter the number of workers/tasks (N): ";
+    cin >> n_ap;
+
+    if (n_ap <= 0) {
+        cout << "Invalid N." << endl;
+        return 1;
+    }
+
+    cost_matrix_ap.assign(n_ap, vector<int>(n_ap));
+    cout << "Enter the cost matrix (" << n_ap << " x " << n_ap << ") for MINIMUM cost assignment:" << endl;
+    for (int i = 0; i < n_ap; i++) {
+        for (int j = 0; j < n_ap; j++) {
+            cin >> cost_matrix_ap[i][j];
+            if (cost_matrix_ap[i][j] == 99999) cost_matrix_ap[i][j] = INF;
+        }
+    }
+
+    task_assigned_ap.assign(n_ap, false);
+    current_assignment_ap.assign(n_ap, -1);
+    min_total_cost_ap = INF;
+
+    solve_assignment_recursive(0, 0);
+
+    if (min_total_cost_ap == INF) {
+        cout << "No valid assignment found or error in input." << endl;
+    } else {
+        cout << "Optimal Assignments:" << endl;
+        for (int i = 0; i < n_ap; i++) {
+            cout << "Worker " << i << " -> Task " << final_assignment_ap[i] 
+                      << " (Cost: " << cost_matrix_ap[i][final_assignment_ap[i]] << ")" << endl;
+        }
+        cout << "Minimum Total Cost: " << min_total_cost_ap << endl;
+    }
+
+    return 0;
+}
+`
+  },
 sampleInput: "Number of tasks/workers (N): 3\nCost Matrix:\n25 10 15\n10 30 5\n20 10 35",
 };

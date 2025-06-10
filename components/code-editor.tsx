@@ -1,7 +1,8 @@
 "use client"
 
 import { Button } from "@/components/ui/button"
-import { Copy, Play, Loader2, Check } from "lucide-react" // Removed Eye, Edit
+import { DropdownMenu, DropdownMenuContent, DropdownMenuItem, DropdownMenuTrigger } from "@/components/ui/dropdown-menu"
+import { Copy, Play, Loader2, Check, ChevronDown } from "lucide-react" // Removed Eye, Edit
 import { useState } from "react"
 import { useTheme } from "next-themes"
 import Editor from "@monaco-editor/react"; // Added Monaco Editor
@@ -14,9 +15,11 @@ interface CodeEditorProps {
   onRun: () => void
   onCopy: () => void
   isRunning: boolean
+  language: 'c' | 'cpp'
+  onLanguageChange: (language: 'c' | 'cpp') => void
 }
 
-export function CodeEditor({ program, code, onCodeChange, onRun, onCopy, isRunning }: CodeEditorProps) {
+export function CodeEditor({ program, code, onCodeChange, onRun, onCopy, isRunning, language, onLanguageChange }: CodeEditorProps) {
   // const [isEditing, setIsEditing] = useState(false) // Removed isEditing state
   const [copied, setCopied] = useState(false)
   const { theme: appTheme } = useTheme() // Renamed to appTheme to avoid potential conflicts
@@ -35,9 +38,22 @@ export function CodeEditor({ program, code, onCodeChange, onRun, onCopy, isRunni
   return (
     <div className="h-full flex flex-col bg-card rounded-lg overflow-hidden">
       <div className="flex items-center justify-between p-2 border-b border-border dark:bg-[#333333]">
-        <div className="flex items-center">
-          <span className="bg-primary/10 text-primary rounded px-2 py-1 text-xs font-medium mr-2">C</span>
-          <span className="hidden md:block text-sm text-muted-foreground">{program.name.toLowerCase().replace(/\s+/g, "-")}.c</span>
+        <div className="flex items-center gap-2">
+          <DropdownMenu>
+            <DropdownMenuTrigger asChild>
+              <Button variant="ghost" size="sm" className="flex items-center gap-1 px-2">
+                <span className="bg-primary/10 text-primary rounded px-2 py-1 text-xs font-medium">
+                  {language === 'cpp' ? 'C++' : 'C'}
+                </span>
+                <ChevronDown className="h-4 w-4 text-muted-foreground" />
+              </Button>
+            </DropdownMenuTrigger>
+            <DropdownMenuContent align="start">
+              <DropdownMenuItem onSelect={() => onLanguageChange('c')}>C</DropdownMenuItem>
+              <DropdownMenuItem onSelect={() => onLanguageChange('cpp')}>C++</DropdownMenuItem>
+            </DropdownMenuContent>
+          </DropdownMenu>
+          <span className="hidden md:block text-sm text-muted-foreground">{program.name.toLowerCase().replace(/\s+/g, "-")}.{language}</span>
         </div>
         <div className="flex gap-2">
           {/* Edit/Preview button removed */}
@@ -54,7 +70,7 @@ export function CodeEditor({ program, code, onCodeChange, onRun, onCopy, isRunni
       <div className="flex-1 overflow-auto">
         <Editor
           height="100%"
-          language="c"
+          language={language}
           theme={appTheme === "dark" ? "vs-dark" : "vs"}
           value={code}
           onChange={(value) => onCodeChange(value || "")}

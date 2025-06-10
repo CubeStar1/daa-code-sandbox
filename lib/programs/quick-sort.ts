@@ -110,7 +110,8 @@ The choice of pivot significantly impacts performance:
 > **Note:** Despite its O(n²) worst case, Quick Sort is often faster in practice than Merge Sort and Heap Sort due to smaller constant factors and good cache performance when implemented well.
     `,
   },
-  code: `
+  code: {
+    c: `
 #include <stdio.h>
 
 void swap(int* a, int* b) {
@@ -167,5 +168,60 @@ int main() {
     return 0;
 }
 `,
-sampleInput: "6\n64 34 25 12 22 11"
+    cpp: `
+#include <bits/stdc++.h>
+using namespace std;
+
+int partition(vector<int>& arr, int low, int high) {
+    int pivot = arr[high];
+    int i = (low - 1);
+
+    for (int j = low; j <= high - 1; j++) {
+        if (arr[j] <= pivot) {
+            i++;
+            swap(arr[i], arr[j]);
+        }
+    }
+    swap(arr[i + 1], arr[high]);
+    return (i + 1);
+}
+
+void quickSort(vector<int>& arr, int low, int high) {
+    if (low < high) {
+        int pi = partition(arr, low, high);
+        quickSort(arr, low, pi - 1);
+        quickSort(arr, pi + 1, high);
+    }
+}
+
+void printArray(const vector<int>& arr) {
+    for (int i = 0; i < arr.size(); i++)
+        cout << arr[i] << " ";
+    cout << endl;
+}
+
+int main() {
+    int n;
+    cout << "Enter number of elements: ";
+    cin >> n;
+
+    if (n <= 0) {
+        cout << "Invalid array size." << endl;
+        return 1;
+    }
+
+    vector<int> arr(n);
+    cout << "Enter " << n << " integers: " << endl;
+    for (int i = 0; i < n; ++i) {
+        cin >> arr[i];
+    }
+
+    quickSort(arr, 0, n - 1);
+    cout << "Sorted array: " << endl;
+    printArray(arr);
+    return 0;
+}
+`
+  },
+  sampleInput: "6\n64 34 25 12 22 11"
 }

@@ -101,7 +101,8 @@ Therefore, the overall space complexity is dominated by the memoization table, r
 *(N = number of items, W = knapsack capacity)*
     `,
   },
-  code: `
+  code: {
+    c: `
 #include <stdio.h>
 #include <string.h> 
 
@@ -176,5 +177,77 @@ int main(void) {
     return 0;
 }
   `,
-sampleInput: "3\n50\n10 60\n20 100\n30 120",
+    cpp: `
+#include <bits/stdc++.h>
+using namespace std;
+
+const int NEG_INF = -1e9;
+
+int knapsack_memoized(
+    int index,
+    int capacity,
+    int n,
+    const vector<int>& weights,
+    const vector<int>& values,
+    vector<vector<int>>& dp
+) {
+    if (capacity < 0) {
+        return NEG_INF;
+    }
+    if (index == n || capacity == 0) {
+        return 0;
+    }
+
+    if (dp[index][capacity] != -1) {
+        return dp[index][capacity];
+    }
+
+    int exclude_item_value = knapsack_memoized(index + 1, capacity, n, weights, values, dp);
+
+    int include_item_value = NEG_INF;
+    if (weights[index] <= capacity) {
+        include_item_value = values[index] + knapsack_memoized(index + 1, capacity - weights[index], n, weights, values, dp);
+    }
+
+    return dp[index][capacity] = max(exclude_item_value, include_item_value);
+}
+
+int main() {
+    int n, W;
+    cout << "Enter number of items: " << endl;
+    cin >> n;
+
+    if (n <= 0) {
+        cout << "Invalid number of items." << endl;
+        return 1;
+    }
+
+    cout << "Enter knapsack capacity: " << endl;
+    cin >> W;
+
+    if (W < 0) {
+        cout << "Invalid knapsack capacity." << endl;
+        return 1;
+    }
+
+    vector<int> weights(n);
+    vector<int> values(n);
+
+    cout << "Enter weight and value of each item (weight value):" << endl;
+    for (int i = 0; i < n; ++i) {
+        cout << "Item " << i + 1 << ": ";
+        cin >> weights[i] >> values[i];
+    }
+
+    vector<vector<int>> dp(n, vector<int>(W + 1, -1));
+
+    int max_value = knapsack_memoized(0, W, n, weights, values, dp);
+
+    cout << "Maximum value that can be obtained = " << max_value << endl;
+
+    return 0;
+}
+`
+  },
+  sampleInput: "3\n50\n10 60\n20 100\n30 120",
 };

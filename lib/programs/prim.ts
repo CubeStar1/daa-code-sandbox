@@ -90,7 +90,8 @@ If an adjacency list were used, it would be O(V+E).
 (V = number of vertices, E = number of edges)
     `,
   },
-  code: `
+  code: {
+    c: `
 #include <stdio.h>
 #include <limits.h> // For INT_MAX
 #include <stdbool.h> // For bool type
@@ -187,5 +188,94 @@ int main(void) {
     return 0;
 }
   `,
-sampleInput: "5\n0 2 0 6 0\n2 0 3 8 5\n0 3 0 0 7\n6 8 0 0 9\n0 5 7 9 0",
+    cpp: `
+#include <bits/stdc++.h>
+using namespace std;
+
+const int INF = INT_MAX;
+
+int minKey(const vector<int>& key, const vector<bool>& mstSet, int V) {
+    int min = INF, min_index = -1;
+
+    for (int v = 0; v < V; v++) {
+        if (!mstSet[v] && key[v] < min) {
+            min = key[v];
+            min_index = v;
+        }
+    }
+    return min_index;
+}
+
+void printMST(const vector<int>& parent, const vector<vector<int>>& graph, int V) {
+    cout << "Edge   Weight" << endl;
+    for (int i = 1; i < V; i++) {
+        if (parent[i] < 0 || parent[i] >= V) {
+            cout << "Error: Invalid parent for vertex " << i << endl;
+            continue;
+        }
+        cout << parent[i] << " - " << i << "    " << graph[i][parent[i]] << endl;
+    }
+}
+
+void primMST(const vector<vector<int>>& graph, int V) {
+    vector<int> parent(V);
+    vector<int> key(V);
+    vector<bool> mstSet(V);
+
+    for (int i = 0; i < V; i++) {
+        key[i] = INF;
+        mstSet[i] = false;
+        parent[i] = -1;
+    }
+
+    key[0] = 0;
+
+    for (int count = 0; count < V; count++) {
+        int u = minKey(key, mstSet, V);
+
+        if (u == -1) {
+            bool all_in_mst = true;
+            for(int k=0; k<V; ++k) if(!mstSet[k]) all_in_mst = false;
+            if(!all_in_mst) cout << "Graph might be disconnected. MST construction stopped." << endl;
+            break;
+        }
+
+        mstSet[u] = true;
+
+        for (int v = 0; v < V; v++) {
+            if (graph[u][v] != 0 && !mstSet[v] && graph[u][v] < key[v]) {
+                parent[v] = u;
+                key[v] = graph[u][v];
+            }
+        }
+    }
+
+    printMST(parent, graph, V);
+}
+
+int main() {
+    int V;
+    cout << "Enter the number of vertices: " << endl;
+    cin >> V;
+
+    if (V <= 0) {
+        cout << "Invalid number of vertices." << endl;
+        return 1;
+    }
+
+    vector<vector<int>> graph(V, vector<int>(V));
+    cout << "Enter the adjacency matrix for the graph (" << V << " x " << V << "):" << endl;
+    for (int i = 0; i < V; i++) {
+        for (int j = 0; j < V; j++) {
+            cin >> graph[i][j];
+        }
+    }
+
+    primMST(graph, V);
+
+    return 0;
+}
+`
+  },
+  sampleInput: "5\n0 2 0 6 0\n2 0 3 8 5\n0 3 0 0 7\n6 8 0 0 9\n0 5 7 9 0",
 };

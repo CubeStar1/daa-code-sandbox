@@ -4,7 +4,8 @@ import { useEffect, useState } from "react" // Keep useState for other states
 import { useIsMobile } from "@/hooks/use-mobile"
 import { programs } from "@/lib/programs"
 import { executeCode } from "@/lib/judge0"
-import NavbarComponent from "@/components/navbar-component"; 
+import NavbarComponent from "@/components/navbar-component";
+import MobileNavbar from "@/components/mobile-navbar"; 
 // ProgramDescription import removed, handled by ProblemDetailsTabs
 import { ProblemDetailsTabs } from "@/components/problem-details-tabs";
 // ComplexityAnalysis import removed, handled by ProblemDetailsTabs
@@ -20,8 +21,15 @@ import type { Program, ExecutionResult } from "@/lib/types"
 export default function CodeSandbox() {
   const isMobileView = useIsMobile();
   const [selectedProgram, setSelectedProgram] = useState<Program>(programs[0])
-  const [code, setCode] = useState(programs[0].code)
+  const [language, setLanguage] = useState<'c' | 'cpp'>('c');
+  const [code, setCode] = useState(programs[0].code.c);
   const [input, setInput] = useState("")
+
+  useEffect(() => {
+    if (selectedProgram) {
+      setCode(selectedProgram.code[language]);
+    }
+  }, [language, selectedProgram]);
   const [output, setOutput] = useState("")
   const [isRunning, setIsRunning] = useState(false)
   const [executionStats, setExecutionStats] = useState<{ time?: number; memory?: number }>({})
@@ -29,11 +37,49 @@ export default function CodeSandbox() {
   const [executionProvider, setExecutionProvider] = useState<'judge0' | 'onecompiler'>('onecompiler');
   const { toast } = useToast();
 
+    const handleNextProgram = () => {
+    const currentIndex = programs.findIndex(p => p.id === selectedProgram.id);
+    const nextIndex = (currentIndex + 1) % programs.length;
+    handleProgramChange(programs[nextIndex].id);
+  };
+
+  const handlePreviousProgram = () => {
+    const currentIndex = programs.findIndex(p => p.id === selectedProgram.id);
+    const prevIndex = (currentIndex - 1 + programs.length) % programs.length;
+    handleProgramChange(programs[prevIndex].id);
+  };
+
+  const handleRandomProgram = () => {
+    const currentIndex = programs.findIndex(p => p.id === selectedProgram.id);
+    let randomIndex;
+    do {
+      randomIndex = Math.floor(Math.random() * programs.length);
+    } while (randomIndex === currentIndex);
+    handleProgramChange(programs[randomIndex].id);
+  };
+
+  useEffect(() => {
+    const handleKeyDown = (event: KeyboardEvent) => {
+      if (event.ctrlKey) {
+        if (event.key === 'ArrowRight') {
+          handleNextProgram();
+        } else if (event.key === 'ArrowLeft') {
+          handlePreviousProgram();
+        }
+      }
+    };
+
+    window.addEventListener('keydown', handleKeyDown);
+    return () => {
+      window.removeEventListener('keydown', handleKeyDown);
+    };
+  }, [selectedProgram]);
+
   const handleProgramChange = (programId: string) => {
     const program = programs.find((p) => p.id === programId)
     if (program) {
       setSelectedProgram(program);
-      setCode(program.code);
+      setCode(program.code[language]);
       setInput(program.sampleInput || ""); // Set input to sampleInput or empty string
       setOutput("");
       setExecutionStats({});
@@ -53,7 +99,7 @@ export default function CodeSandbox() {
     setOutput("")
     setExecutionStats({})
 
-    const result: ExecutionResult = await executeCode(code, input, executionProvider);
+        const result: ExecutionResult = await executeCode(code, input, executionProvider, language);
 
     if (result.isRateLimited) {
       toast({
@@ -79,20 +125,33 @@ export default function CodeSandbox() {
   return (
     <>
     <div className="min-h-screen bg-background flex flex-col">
-      <NavbarComponent 
-        programs={programs}
-        selectedProgram={selectedProgram}
-        onProgramChange={handleProgramChange}
-        executionProvider={executionProvider}
-        onExecutionProviderChange={(value) => setExecutionProvider(value as 'judge0' | 'onecompiler')}
-      />
+                  {isMobileView ? (
+        <MobileNavbar
+          programs={programs}
+          selectedProgram={selectedProgram}
+          onProgramChange={handleProgramChange}
+          executionProvider={executionProvider}
+          onExecutionProviderChange={setExecutionProvider}
+        />
+      ) : (
+        <NavbarComponent 
+          programs={programs}
+          selectedProgram={selectedProgram}
+          onProgramChange={handleProgramChange}
+          onNextProgram={handleNextProgram}
+          onPreviousProgram={handlePreviousProgram}
+          onRandomProgram={handleRandomProgram}
+          executionProvider={executionProvider}
+          onExecutionProviderChange={setExecutionProvider}
+        />
+      )}
 
       <div className="flex-1 p-2">
         {isMobileView === undefined ? (
           null // Or a loading spinner/placeholder
         ) : isMobileView ? (
           // Mobile layout: Only Code Editor & I/O
-          <div className="flex flex-col h-[calc(100vh-12rem)] overflow-y-auto">
+          <div className="flex flex-col h-[calc(100vh-5rem)] overflow-y-auto">
             {/* Panel: Code Editor & I/O - Takes full height */}
             <div className="h-full flex flex-col">
               {/* Code editor - takes more relative height */}
@@ -104,6 +163,8 @@ export default function CodeSandbox() {
                   onRun={runCode}
                   onCopy={copyCode}
                   isRunning={isRunning}
+                  language={language}
+                  onLanguageChange={setLanguage}
                 />
               </div>
               {/* Input/Output - takes less relative height */}
@@ -135,6 +196,8 @@ export default function CodeSandbox() {
                       onRun={runCode}
                       onCopy={copyCode}
                       isRunning={isRunning}
+                      language={language}
+                      onLanguageChange={setLanguage}
                     />
                   </div>
                 </ResizablePanel>

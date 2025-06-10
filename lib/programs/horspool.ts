@@ -101,7 +101,8 @@ Horspool's algorithm is a string searching algorithm that improves upon naive se
 Horspool's is simpler to implement than Boyer-Moore and KMP, and often performs very well in practice, making it a good trade-off between implementation complexity and performance.
     `,
   },
-  code: `
+  code: {
+    c: `
 #include <stdio.h>
 #include <string.h>
 #include <limits.h>
@@ -157,5 +158,62 @@ int main(void)
     return 0;
 }
 `,
-sampleInput: "AABAACAADAABAABA\nAABA"
+    cpp: `
+#include <bits/stdc++.h>
+using namespace std;
+
+const int ALPHABET_SIZE = 256;
+
+void buildShift(const string& pat, vector<int>& shift) {
+    int m = pat.length();
+    shift.assign(ALPHABET_SIZE, m);
+
+    for (int i = 0; i < m - 1; ++i) {
+        shift[static_cast<unsigned char>(pat[i])] = m - 1 - i;
+    }
+}
+
+int horspool(const string& text, const string& pat) {
+    int n = text.length();
+    int m = pat.length();
+
+    if (m == 0 || m > n) return -1;
+
+    vector<int> shift;
+    buildShift(pat, shift);
+
+    int i = m - 1;
+    while (i < n) {
+        int k = 0;
+        while (k < m && pat[m - 1 - k] == text[i - k]) {
+            k++;
+        }
+
+        if (k == m) {
+            return i - m + 1;
+        }
+
+        i += shift[static_cast<unsigned char>(text[i])];
+    }
+    return -1;
+}
+
+int main() {
+    string text, pat;
+    cout << "Enter the text: " << endl;
+    getline(cin, text);
+    cout << "Enter the pattern: " << endl;
+    getline(cin, pat);
+
+    int pos = horspool(text, pat);
+    if (pos == -1)
+        cout << "Pattern NOT found." << endl;
+    else
+        cout << "Pattern found at index " << pos << "." << endl;
+
+    return 0;
+}
+`
+  },
+  sampleInput: "AABAACAADAABAABA\nAABA"
 }

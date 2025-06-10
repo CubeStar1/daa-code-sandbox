@@ -87,7 +87,8 @@ At each step i, the algorithm decides whether to include w[i] in the subset or n
 Note: The Subset Sum problem is NP-complete. While this backtracking solution is exponential, pseudo-polynomial time solutions using dynamic programming exist (e.g., O(N*M)).
     `,
   },
-  code: `
+  code: {
+    c: `
 #include <stdio.h>
 
 #define MAX  30                 
@@ -144,5 +145,65 @@ int main(void)
     return 0;
 }
   `,
-sampleInput: "7\n35\n10\n7\n5\n18\n12\n20\n15",
+    cpp: `
+#include <bits/stdc++.h>
+using namespace std;
+
+int n, M;
+vector<int> w;
+vector<bool> x;
+
+void printSubset() {
+    cout << "{ ";
+    for (int i = 0; i < n; ++i) {
+        if (x[i]) {
+            cout << w[i] << " ";
+        }
+    }
+    cout << "}" << endl;
+}
+
+void sumSubset(int i, int currSum, int remSum) {
+    if (currSum == M) {
+        printSubset();
+        return;
+    }
+    if (i == n || currSum + remSum < M) {
+        return;
+    }
+
+    if (currSum + w[i] <= M) {
+        x[i] = true;
+        sumSubset(i + 1, currSum + w[i], remSum - w[i]);
+    }
+
+    x[i] = false;
+    sumSubset(i + 1, currSum, remSum - w[i]);
+}
+
+int main() {
+    cout << "Enter number of items: " << endl;
+    cin >> n;
+
+    cout << "Enter target sum M: " << endl;
+    cin >> M;
+
+    cout << "Enter each item's weight:" << endl;
+    w.resize(n);
+    x.resize(n);
+    int total = 0;
+    for (int i = 0; i < n; ++i) {
+        cin >> w[i];
+        total += w[i];
+        x[i] = false;
+    }
+
+    cout << endl << "Subsets summing to M:" << endl;
+    sumSubset(0, 0, total);
+
+    return 0;
+}
+`
+  },
+  sampleInput: "7\n35\n10\n7\n5\n18\n12\n20\n15",
 };

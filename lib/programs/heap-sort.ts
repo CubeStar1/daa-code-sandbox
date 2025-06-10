@@ -97,7 +97,8 @@ Heap Sort is a comparison-based sorting technique based on a Binary Heap data st
 | Quick Sort   | O(n log n)  | O(n log n)   | O(n²)      | O(log n)          | ✗      |
     `,
   },
-  code: `
+  code: {
+    c: `
 #include <stdio.h>
 
 void heapify(int arr[], int n, int i) {
@@ -159,5 +160,67 @@ int main() {
     return 0;
 }
 `,
-sampleInput: "5\n12 11 13 5 6"
+    cpp: `
+#include <bits/stdc++.h>
+using namespace std;
+
+void heapify(vector<int>& arr, int n, int i) {
+    int largest = i;
+    int l = 2 * i + 1;
+    int r = 2 * i + 2;
+
+    if (l < n && arr[l] > arr[largest])
+        largest = l;
+
+    if (r < n && arr[r] > arr[largest])
+        largest = r;
+
+    if (largest != i) {
+        swap(arr[i], arr[largest]);
+        heapify(arr, n, largest);
+    }
+}
+
+void heapSort(vector<int>& arr) {
+    int n = arr.size();
+
+    for (int i = n / 2 - 1; i >= 0; i--)
+        heapify(arr, n, i);
+
+    for (int i = n - 1; i > 0; i--) {
+        swap(arr[0], arr[i]);
+        heapify(arr, i, 0);
+    }
+}
+
+void printArray(const vector<int>& arr) {
+    for (int val : arr)
+        cout << val << " ";
+    cout << endl;
+}
+
+int main() {
+    int n;
+    cout << "Enter number of elements: " << endl;
+    cin >> n;
+
+    if (n <= 0) {
+        cout << "Number of elements must be positive." << endl;
+        return 1;
+    }
+
+    vector<int> arr(n);
+    cout << "Enter " << n << " integers: " << endl;
+    for (int i = 0; i < n; ++i)
+        cin >> arr[i];
+
+    heapSort(arr);
+
+    cout << "Sorted array is " << endl;
+    printArray(arr);
+    return 0;
+}
+`
+  },
+  sampleInput: "5\n12 11 13 5 6"
 }

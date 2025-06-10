@@ -25,9 +25,11 @@ interface OneCompilerRequest {
   files: FileEntry[];
 }
 
-// Mapping for C language (Judge0 ID 50 to OneCompiler 'c')
-const C_LANGUAGE_ID_JUDGE0 = 50;
+// Mapping for C and C++ languages from Judge0 IDs to OneCompiler strings
+const C_LANGUAGE_ID_JUDGE0 = 50; // C (GCC 9.2.0)
+const CPP_LANGUAGE_ID_JUDGE0 = 54; // C++ (GCC 9.2.0)
 const ONECOMPILER_C_LANG = "c";
+const ONECOMPILER_CPP_LANG = "cpp";
 
 export async function executeOneCompiler(
   languageId: number,
@@ -39,15 +41,21 @@ export async function executeOneCompiler(
     throw new Error("ONECOMPILER_API_KEY is not set in .env");
   }
 
-  if (languageId !== C_LANGUAGE_ID_JUDGE0) {
+  let oneCompilerLanguage: string;
+  let fileName: string;
+
+  if (languageId === C_LANGUAGE_ID_JUDGE0) {
+    oneCompilerLanguage = ONECOMPILER_C_LANG;
+    fileName = "main.c";
+  } else if (languageId === CPP_LANGUAGE_ID_JUDGE0) {
+    oneCompilerLanguage = ONECOMPILER_CPP_LANG;
+    fileName = "main.cpp";
+  } else {
     return {
       status: "error",
-      message: `OneCompiler integration currently only supports C (Language ID ${C_LANGUAGE_ID_JUDGE0}). Received ${languageId}.`,
+      message: `OneCompiler integration currently only supports C (ID ${C_LANGUAGE_ID_JUDGE0}) and C++ (ID ${CPP_LANGUAGE_ID_JUDGE0}). Received ${languageId}.`,
     };
   }
-  const oneCompilerLanguage = ONECOMPILER_C_LANG;
-
-  const fileName = "main.c";
 
   const requestBody: OneCompilerRequest = {
     language: oneCompilerLanguage,

@@ -78,7 +78,8 @@ The N-Queens problem is typically solved using a backtracking algorithm. The alg
 -   So, the space complexity is typically O(N).
     `,
   },
-  code: `
+  code: {
+    c: `
 #include <stdio.h>
 #include <string.h>          
 
@@ -140,5 +141,75 @@ int main(void)
     return 0;
 }
   `,
-sampleInput: "4",
+    cpp: `
+#include <bits/stdc++.h>
+using namespace std;
+
+bool solution_found = false;
+
+void printBoard(int N, const vector<int>& board) {
+    for (int r = 0; r < N; ++r) {
+        for (int c = 0; c < N; ++c) {
+            cout << (board[r] == c ? 'Q' : '.');
+        }
+        cout << endl;
+    }
+    cout << endl;
+}
+
+void solve(int r, int N, vector<int>& board, vector<bool>& cols, vector<bool>& diag1, vector<bool>& diag2) {
+    if (solution_found) return;
+
+    if (r == N) {
+        printBoard(N, board);
+        solution_found = true;
+        return;
+    }
+
+    for (int c = 0; c < N; ++c) {
+        if (cols[c] || diag1[r - c + N - 1] || diag2[r + c]) {
+            continue;
+        }
+
+        board[r] = c;
+        cols[c] = true;
+        diag1[r - c + N - 1] = true;
+        diag2[r + c] = true;
+
+        solve(r + 1, N, board, cols, diag1, diag2);
+        if (solution_found) return;
+
+        cols[c] = false;
+        diag1[r - c + N - 1] = false;
+        diag2[r + c] = false;
+    }
+}
+
+int main() {
+    int N;
+    cout << "Enter N: " << endl;
+    cin >> N;
+
+    if (N < 1) {
+        cout << "Invalid N." << endl;
+        return 1;
+    }
+
+    vector<int> board(N);
+    vector<bool> cols(N, false);
+    vector<bool> diag1(2 * N - 1, false);
+    vector<bool> diag2(2 * N - 1, false);
+
+    cout << "\nOne solution to the N-Queens problem:" << endl;
+    solve(0, N, board, cols, diag1, diag2);
+
+    if (!solution_found) {
+        cout << "\nNo solution (N = 2 or 3)." << endl;
+    }
+
+    return 0;
+}
+`
+  },
+  sampleInput: "4",
 };

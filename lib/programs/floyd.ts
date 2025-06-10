@@ -95,7 +95,8 @@ Therefore, the total number of times the constant time update operation is perfo
 Floyd-Warshall is particularly useful for dense graphs where V is relatively small, due to its O(V³) complexity. For sparse graphs, running Dijkstra's algorithm from each vertex (if edge weights are non-negative) can sometimes be more efficient.
     `,
   },
-  code: `
+  code: {
+    c: `
 #include <stdio.h>
 #include <limits.h> 
 
@@ -170,5 +171,72 @@ int main(void) {
     return 0;
 }
   `,
-sampleInput: "4\n0 5 99999 10\n99999 0 3 99999\n99999 99999 0 1\n99999 99999 99999 0",
+    cpp: `
+#include <bits/stdc++.h>
+using namespace std;
+
+const int INF = 99999;
+
+void printMatrix(const vector<vector<int>>& matrix, int V) {
+    cout << "Shortest Path Matrix:" << endl;
+    for (int i = 0; i < V; i++) {
+        for (int j = 0; j < V; j++) {
+            if (matrix[i][j] == INF)
+                cout << setw(7) << "INF";
+            else
+                cout << setw(7) << matrix[i][j];
+        }
+        cout << endl;
+    }
+}
+
+void floydWarshall(const vector<vector<int>>& graph, int V) {
+    vector<vector<int>> dist = graph;
+
+    for (int k = 0; k < V; k++) {
+        for (int i = 0; i < V; i++) {
+            for (int j = 0; j < V; j++) {
+                if (dist[i][k] != INF && dist[k][j] != INF &&
+                    dist[i][k] + dist[k][j] < dist[i][j]) {
+                    dist[i][j] = dist[i][k] + dist[k][j];
+                }
+            }
+        }
+    }
+
+    printMatrix(dist, V);
+
+    for (int i = 0; i < V; i++) {
+        if (dist[i][i] < 0) {
+            cout << "\nGraph contains a negative weight cycle!" << endl;
+            return;
+        }
+    }
+}
+
+int main() {
+    int V;
+    cout << "Enter the number of vertices: " << endl;
+    cin >> V;
+
+    if (V <= 0) {
+        cout << "Invalid number of vertices." << endl;
+        return 1;
+    }
+
+    vector<vector<int>> graph(V, vector<int>(V));
+    cout << "Enter the adjacency matrix (weights, use " << INF << " for INF) for the graph (" << V << " x " << V << "):" << endl;
+    for (int i = 0; i < V; i++) {
+        for (int j = 0; j < V; j++) {
+            cin >> graph[i][j];
+        }
+    }
+
+    floydWarshall(graph, V);
+
+    return 0;
+}
+`
+  },
+  sampleInput: "4\n0 5 99999 10\n99999 0 3 99999\n99999 99999 0 1\n99999 99999 99999 0",
 };

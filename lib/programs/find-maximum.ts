@@ -104,7 +104,9 @@ Where **c** is the constant time for each comparison.
 - **Minimal space usage** - only uses constant extra space
     `,
   },
-  code: `#include <stdio.h>
+  code: {
+    c: `
+#include <stdio.h>
 
 int main(void)
 {
@@ -138,5 +140,42 @@ int main(void)
     return 0;
 }
 `,
-sampleInput: "5\n1 3 7 2 9",
+    cpp: `
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int n;
+    cout << "Enter how many numbers: " << endl;
+    cin >> n;
+
+    if (n <= 0) {
+        cout << "Nothing to compare!" << endl;
+        return 0;
+    }
+
+    vector<int> nums(n);
+    cout << "Enter " << n << " numbers: " << endl;
+    for (int i = 0; i < n; ++i) {
+        cin >> nums[i];
+    }
+
+    int max_val = nums[0];
+    for (int i = 1; i < n; ++i) {
+        if (nums[i] > max_val) {
+            max_val = nums[i];
+        }
+    }
+
+    // Alternative using std::max_element
+    // auto max_it = max_element(nums.begin(), nums.end());
+    // int max_val = *max_it;
+
+    cout << "Maximum = " << max_val << endl;
+
+    return 0;
+}
+`
+  },
+  sampleInput: "5\n1 3 7 2 9",
 }

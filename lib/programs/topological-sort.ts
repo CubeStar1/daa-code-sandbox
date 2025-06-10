@@ -90,7 +90,8 @@ So, for an adjacency list representation, the space is O(V + E). For the provide
 - The \\\`deg[u]\\\` effectively tells how many neighbors \\\`u\\\` has, and \\\`adj[u][0...deg[u]-1]\\\` are those neighbors.
     `,
   },
-  code: `
+  code: {
+    c: `
 #include <stdio.h>
 #include <stdlib.h>
 
@@ -163,6 +164,74 @@ int main(void)
     return 0;
 }
 `,
-sampleInput: "6\n6\n5 2\n5 0\n4 0\n4 1\n2 3\n3 1"
+    cpp: `
+#include <bits/stdc++.h>
+using namespace std;
+
+int main() {
+    int V, E;
+    cout << "Enter number of vertices: " << endl;
+    cin >> V;
+
+    if (V <= 0) {
+        cout << "Invalid number of vertices" << endl;
+        return 1;
+    }
+
+    vector<vector<int>> adj(V);
+    vector<int> indeg(V, 0);
+
+    cout << "Enter number of directed edges: " << endl;
+    cin >> E;
+
+    cout << "Enter edges as pairs: src dest (0-based labels)" << endl;
+    for (int i = 0; i < E; ++i) {
+        int u, v;
+        cin >> u >> v;
+        if (u >= 0 && u < V && v >= 0 && v < V) {
+            adj[u].push_back(v);
+            indeg[v]++;
+        }
+    }
+
+    queue<int> q;
+    for (int i = 0; i < V; ++i) {
+        if (indeg[i] == 0) {
+            q.push(i);
+        }
+    }
+
+    vector<int> top_order;
+    int visited_count = 0;
+
+    while (!q.empty()) {
+        int u = q.front();
+        q.pop();
+        top_order.push_back(u);
+        visited_count++;
+
+        for (int v : adj[u]) {
+            indeg[v]--;
+            if (indeg[v] == 0) {
+                q.push(v);
+            }
+        }
+    }
+
+    if (visited_count != V) {
+        cout << "Graph has a cycle! No topological ordering." << endl;
+    } else {
+        cout << "Topological order:" << endl;
+        for (int i = 0; i < top_order.size(); ++i) {
+            cout << top_order[i] << (i == top_order.size() - 1 ? "" : " ");
+        }
+        cout << endl;
+    }
+
+    return 0;
+}
+`
+  },
+  sampleInput: "6\n6\n5 2\n5 0\n4 0\n4 1\n2 3\n3 1"
 }
 

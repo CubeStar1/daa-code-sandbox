@@ -4,8 +4,9 @@ const JUDGE0_API_URL = process.env.JUDGE0_API_URL!
 const RAPIDAPI_KEY = process.env.RAPIDAPI_KEY!
 const RAPIDAPI_HOST = process.env.RAPIDAPI_HOST!
 const C_LANGUAGE_ID = process.env.C_LANGUAGE_ID!
+const CPP_LANGUAGE_ID = process.env.CPP_LANGUAGE_ID!
 
-export async function executeCode(code: string, input = "", provider?: 'judge0' | 'onecompiler'): Promise<ExecutionResult> {
+export async function executeCode(code: string, input = "", provider?: 'judge0' | 'onecompiler', language: 'c' | 'cpp' = 'c'): Promise<ExecutionResult> {
   try {
     const apiUrl = provider ? `/api/execute?provider=${provider}` : "/api/execute";
     const response = await fetch(apiUrl, {
@@ -13,7 +14,7 @@ export async function executeCode(code: string, input = "", provider?: 'judge0' 
       headers: {
         "Content-Type": "application/json",
       },
-      body: JSON.stringify({ code, input }),
+            body: JSON.stringify({ code, input, language }),
     })
 
     if (!response.ok) {
@@ -43,4 +44,4 @@ export async function executeCode(code: string, input = "", provider?: 'judge0' 
   }
 }
 
-export { JUDGE0_API_URL, RAPIDAPI_KEY, RAPIDAPI_HOST, C_LANGUAGE_ID }
+export { JUDGE0_API_URL, RAPIDAPI_KEY, RAPIDAPI_HOST, C_LANGUAGE_ID, CPP_LANGUAGE_ID }

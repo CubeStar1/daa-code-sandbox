@@ -132,7 +132,8 @@ T(n) = n⋅T(1) + cn⋅log₂ n = O(n log n)
 > **Note:** Merge Sort is the only comparison-based sort that guarantees O(n log n) performance in all cases while maintaining stability.
     `,
   },
-  code: `#include <stdio.h>
+  code: {
+    c: `#include <stdio.h>
 #include <stdlib.h>   
 
 void merge(int a[], int l, int m, int r)
@@ -183,5 +184,67 @@ int main(void)
     return 0;
 }
 `,
-sampleInput: "6\n64 34 25 12 22 11"
+    cpp: `
+#include <bits/stdc++.h>
+using namespace std;
+
+void merge(vector<int>& arr, int l, int m, int r) {
+    int n1 = m - l + 1;
+    int n2 = r - m;
+
+    vector<int> left(n1);
+    vector<int> right(n2);
+
+    for (int i = 0; i < n1; ++i)
+        left[i] = arr[l + i];
+    for (int j = 0; j < n2; ++j)
+        right[j] = arr[m + 1 + j];
+
+    int i = 0, j = 0, k = l;
+    while (i < n1 && j < n2) {
+        if (left[i] <= right[j]) {
+            arr[k++] = left[i++];
+        } else {
+            arr[k++] = right[j++];
+        }
+    }
+
+    while (i < n1) {
+        arr[k++] = left[i++];
+    }
+    while (j < n2) {
+        arr[k++] = right[j++];
+    }
+}
+
+void mergeSort(vector<int>& arr, int l, int r) {
+    if (l >= r) return;
+    int m = l + (r - l) / 2;
+    mergeSort(arr, l, m);
+    mergeSort(arr, m + 1, r);
+    merge(arr, l, m, r);
+}
+
+int main() {
+    int n;
+    cout << "Enter number of elements: " << endl;
+    cin >> n;
+
+    vector<int> arr(n);
+    cout << "Enter " << n << " integers: " << endl;
+    for (int i = 0; i < n; ++i)
+        cin >> arr[i];
+
+    mergeSort(arr, 0, n - 1);
+
+    cout << "Sorted array:" << endl;
+    for (int i = 0; i < n; ++i)
+        cout << arr[i] << " ";
+    cout << endl;
+
+    return 0;
+}
+`
+  },
+  sampleInput: "6\n64 34 25 12 22 11"
 }

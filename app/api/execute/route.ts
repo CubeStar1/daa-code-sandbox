@@ -1,19 +1,21 @@
 import { type NextRequest, NextResponse } from "next/server"
-import { JUDGE0_API_URL, RAPIDAPI_KEY, RAPIDAPI_HOST, C_LANGUAGE_ID } from "@/lib/judge0";
+import { JUDGE0_API_URL, RAPIDAPI_KEY, RAPIDAPI_HOST, C_LANGUAGE_ID, CPP_LANGUAGE_ID } from "@/lib/judge0";
 import { executeOneCompiler, OneCompilerResponse, OneCompilerErrorResponse } from "../../../lib/onecompiler";
 
 export async function POST(request: NextRequest) {
   const searchParams = request.nextUrl.searchParams;
   const provider = searchParams.get('provider') || 'onecompiler'; // Default to judge0
   try {
-    const { code, input } = await request.json()
+        const { code, input, language } = await request.json()
+
+    const languageId = language === 'cpp' ? CPP_LANGUAGE_ID : C_LANGUAGE_ID;
 
     if (!code) {
       return NextResponse.json({ error: "Code is required" }, { status: 400 })
     }
 
     if (provider === 'onecompiler') {
-      const oneCompilerResult = await executeOneCompiler(parseInt(C_LANGUAGE_ID, 10), code, input || "");
+            const oneCompilerResult = await executeOneCompiler(parseInt(languageId, 10), code, input || "");
 
       if (oneCompilerResult.status === 'error') {
         const errorDetails = oneCompilerResult as OneCompilerErrorResponse;
@@ -60,7 +62,7 @@ export async function POST(request: NextRequest) {
           "X-RapidAPI-Host": RAPIDAPI_HOST,
         },
         body: JSON.stringify({
-          language_id: C_LANGUAGE_ID,
+                    language_id: languageId,
           source_code: code,
           stdin: input || "",
         }),
