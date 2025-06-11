@@ -99,30 +99,6 @@ int final_assignment_ap[MAX_N];
 bool task_assigned_ap[MAX_N];
 int min_total_cost_ap = INF;
 
-// This function is provided for context but not used in the final recursive solution below.
-int calculate_lower_bound_ap(int worker_idx, int current_path_cost) {
-    int bound = current_path_cost;
-    for (int w = worker_idx; w < n_ap; w++) {
-        int min_cost_for_worker = INF;
-        for (int t = 0; t < n_ap; t++) {
-            if (!task_assigned_ap[t]) {
-                bool task_potentially_available = true;
-                for(int prev_w = 0; prev_w < worker_idx; ++prev_w) {
-                    if(current_assignment_ap[prev_w] == t) {
-                        task_potentially_available = false;
-                        break;
-                    }
-                }
-                if (task_potentially_available && cost_matrix_ap[w][t] < min_cost_for_worker) {
-                    min_cost_for_worker = cost_matrix_ap[w][t];
-                }
-            }
-        }
-        if (min_cost_for_worker == INF && worker_idx < n_ap) return INF;
-        if (min_cost_for_worker != INF) bound += min_cost_for_worker;
-    }
-    return bound;
-}
 
 void solve_assignment_recursive(int worker_idx, int current_path_cost) {
     if (worker_idx == n_ap) {

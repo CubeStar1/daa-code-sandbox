@@ -167,10 +167,6 @@ int main() {
         }
     }
 
-    // Alternative using std::max_element
-    // auto max_it = max_element(nums.begin(), nums.end());
-    // int max_val = *max_it;
-
     cout << "Maximum = " << max_val << endl;
 
     return 0;

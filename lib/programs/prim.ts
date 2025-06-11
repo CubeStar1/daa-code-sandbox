@@ -93,11 +93,11 @@ If an adjacency list were used, it would be O(V+E).
   code: {
     c: `
 #include <stdio.h>
-#include <limits.h> // For INT_MAX
-#include <stdbool.h> // For bool type
+#include <limits.h> 
+#include <stdbool.h> 
 
 #define MAX_VERTICES 100
-#define INF INT_MAX // Using INT_MAX for infinity for key values
+#define INF INT_MAX 
 
 int minKey(int key[], bool mstSet[], int V) {
     int min = INF, min_index = -1;
