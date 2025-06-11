@@ -2,166 +2,133 @@ import type { Program } from "../types"
 
 export const topologicalSortProgram: Program = {
   id: "topological-sort",
-  name: "Topological Sort (Kahn's Algorithm)",
+  name: "Topological Sort (DFS based)",
   description:
-    "Algorithm to find a linear ordering of nodes in a directed acyclic graph (DAG) such that for every directed edge from node u to node v, node u comes before node v in the ordering. This implementation uses Kahn's algorithm, which is based on in-degrees.",
+    "A linear ordering of vertices such that for every directed edge from vertex u to vertex v, u comes before v in the ordering. This implementation uses Depth-First Search (DFS) and is only for Directed Acyclic Graphs (DAGs).",
   category: "Decrease and Conquer",
   examples: [
     {
       input: "6\n6\n5 2\n5 0\n4 0\n4 1\n2 3\n3 1",
-      output: "Topological order:\n4 5 0 2 3 1 \n(Note: Other valid orders like 5 4 0 2 3 1 may exist)",
+      output: "Topological Sort (DFS based):\n5 4 2 3 1 0 ",
       explanation:
-        "A valid topological sort for the given DAG. Vertices are processed based on their in-degrees.",
+        "A valid topological sort for the given DAG using a DFS-based approach. The exact output can vary based on the traversal order.",
     },
     {
       input: "3\n3\n0 1\n1 2\n2 0",
-      output: "Topological order:\nGraph has a cycle! No topological ordering.\n",
-      explanation: "The graph contains a cycle (0->1->2->0), so a topological sort is not possible.",
+      output: "Topological Sort (DFS based):\n0 1 2 ",
+      explanation: "This implementation does not detect cycles. For a cyclic graph, it will produce an ordering, but it will not be a valid topological sort.",
     },
   ],
   algorithmSteps: [
-    "Initialize in-degrees of all vertices to 0.",
-    "Read the graph edges and compute the actual in-degree for each vertex.",
-    "Initialize a queue.",
-    "Add all vertices with an in-degree of 0 to the queue.",
-    "Initialize a counter for visited vertices to 0 and an array/list to store the topological order.",
-    "While the queue is not empty:",
-    "  Dequeue a vertex 'u' from the queue.",
-    "  Add 'u' to the topological order list.",
-    "  Increment the visited vertices counter.",
-    "  For each neighbor 'v' of 'u':",
-    "    Decrement the in-degree of 'v'.",
-    "    If the in-degree of 'v' becomes 0, enqueue 'v'.",
-    "If the count of visited vertices is not equal to the total number of vertices, the graph has a cycle, and no topological ordering exists.",
-    "Otherwise, the list contains a valid topological order.",
+    "Initialize a stack to store the topologically sorted vertices.",
+    "Initialize a 'visited' array to keep track of visited vertices.",
+    "For each vertex 'u' in the graph:",
+    "  If 'u' has not been visited, call a recursive DFS helper function on 'u'.",
+    "In the DFS helper function for vertex 'u':",
+    "  Mark 'u' as visited.",
+    "  For each neighbor 'v' of 'u' (where there is an edge from u to v):",
+    "    If 'v' has not been visited, recursively call the DFS helper on 'v'.",
+    "  After visiting all neighbors, push 'u' onto the stack.",
+    "After the main loop finishes, the contents of the stack, when popped one by one, give the topological sort.",
   ],
   keyProperties: [
     "Applicable only to Directed Acyclic Graphs (DAGs).",
-    "Kahn's algorithm is one of the standard methods (another is DFS-based).",
-    "Can detect cycles in a directed graph.",
-    "Multiple valid topological sorts can exist for a given DAG.",
-    "Used in scheduling tasks, resolving dependencies (e.g., in compilers, build systems), and data serialization.",
+    "This implementation uses a recursive, DFS-based approach.",
+    "The basic version shown here does not detect cycles.",
+    "The resulting order depends on the starting points of the DFS and the order of neighbor traversal.",
   ],
   timeComplexity: {
-    best: "O(V + E)",
-    average: "O(V + E)",
-    worst: "O(V + E)",
-    space: "O(V + E) for adjacency list representation, O(V^2) for adjacency matrix. O(V) for queue and in-degree array.",
+    best: "O(V^2)",
+    average: "O(V^2)",
+    worst: "O(V^2)",
+    space: "O(V^2) for adjacency matrix, O(V) for auxiliary space (visited array and recursion stack).",
     analysis: `
-# Time Complexity Analysis for Topological Sort (Kahn's Algorithm)
+# Time and Space Complexity Analysis for Topological Sort (DFS-based with Adjacency Matrix)
 
-## Algorithm Overview
+## Time Complexity: O(V²)
 
-Kahn's algorithm for topological sorting works by iteratively finding nodes with no incoming edges (in-degree of 0), adding them to the sorted list, and then conceptually removing them and their outgoing edges from the graph. This process is repeated until no more such nodes can be found.
+1.  **DFS Traversal**: The core of the algorithm is a Depth-First Search (DFS).
+2.  **Vertex Visitation**: Each vertex is visited exactly once. The main loop iterates through all V vertices, and the recursive helper function ensures that it only processes unvisited vertices.
+3.  **Neighbor Discovery**: When visiting a vertex \`u\`, the algorithm needs to find all its neighbors. With an **adjacency matrix**, this requires scanning the entire row for \`u\`, which takes O(V) time.
+4.  **Total Time**: Since the O(V) neighbor discovery process is performed for each of the V vertices, the total time complexity is V * O(V) = **O(V²)**.
 
-## Complexity Summary
+If an adjacency list were used, the time complexity would be O(V + E).
 
-| Case      | Time Complexity | Space Complexity (Adjacency List) | Space Complexity (Adjacency Matrix - as in code) |
-|-----------|-----------------|-----------------------------------|----------------------------------------------------|
-| **All**   | O(V + E)        | O(V + E)                          | O(V²) (for matrix) + O(V) (for queue/indegree)     |
+## Space Complexity
 
-Where V is the number of vertices and E is the number of edges.
+1.  **Adjacency Matrix**: Storing the graph itself requires O(V²) space.
+2.  **Visited Array**: An array of size V is needed, which is O(V) space.
+3.  **Recursion Stack**: The depth of the recursion can be at most V, contributing O(V) to the space complexity.
+4.  **Output Stack**: The stack used to store the sorted vertices will hold all V vertices, requiring O(V) space.
 
-## Detailed Analysis
-
-### Time Complexity: O(V + E)
-
-1.  **In-degree Calculation:** Iterating through all edges to calculate in-degrees takes O(E) time. If initializing in-degrees for all V vertices first, it's O(V) + O(E).
-2.  **Initial Queue Population:** Scanning all V vertices to find those with an in-degree of 0 and adding them to the queue takes O(V) time.
-3.  **Main Loop (Processing Vertices and Edges):**
-    *   Each vertex is enqueued and dequeued at most once. This accounts for O(V) operations.
-    *   When a vertex 'u' is dequeued, its outgoing edges are traversed. Each edge (u,v) in the graph is processed exactly once over the entire algorithm execution (when 'u' is dequeued and 'v's in-degree is updated). This accounts for O(E) operations.
-
-Therefore, the total time complexity is O(V + E).
-
-### Space Complexity
-
-1.  **Graph Representation:**
-    *   **Adjacency List (Typical):** O(V + E)
-    *   **Adjacency Matrix (as in provided C code \\\`adj[MAX][MAX]\\\`):** O(V²) if MAX is considered proportional to V. The provided code uses a fixed \\\`MAX\\\`, so it's O(MAX²), but for analysis relative to V, it's O(V²).
-2.  **In-degree Array (\\\`indeg\\\`):** O(V)
-3.  **Queue (\\\`q\\\`):** In the worst case, all vertices might be in the queue (e.g., a graph with no edges, or many nodes with in-degree 0 initially), so O(V).
-4.  **Output List (Implicit):** O(V) to store the topological sort.
-
-So, for an adjacency list representation, the space is O(V + E). For the provided code's adjacency matrix, it's dominated by O(V²) + O(V) = O(V²).
-
-## Notes on Provided C Code
-- The C code uses an adjacency matrix \\\`adj[MAX][MAX]\\\` and a \\\`deg[MAX]\\\` array to store outgoing edges for each vertex in a compact way within the matrix structure. This is a common way to implement adjacency lists using a matrix if the maximum degree is bounded or if one wants to avoid dynamic memory allocation for lists per vertex.
-- The \\\`deg[u]\\\` effectively tells how many neighbors \\\`u\\\` has, and \\\`adj[u][0...deg[u]-1]\\\` are those neighbors.
+The auxiliary space complexity (excluding the input graph) is O(V). The total space complexity including the graph representation is **O(V²)**.
     `,
   },
   code: {
     c: `
 #include <stdio.h>
-#include <stdlib.h>
 
 #define MAX 100
+int adj[MAX][MAX];
+int visited[MAX];
+int stack[MAX];
+int top = -1;
 
-typedef struct {
-    int data[MAX];
-    int front, rear;
-} Queue;
+// Function declarations
+void addEdge(int u, int v);
+void topoSort(int n);
+void dfs(int u, int n);
 
-void initQueue(Queue *q) { q->front = q->rear = 0; }
-int  isEmpty(Queue *q) { return q->front == q->rear; }
-void enqueue(Queue *q, int x) { q->data[q->rear++] = x; }
-int  dequeue(Queue *q) { return q->data[q->front++]; }
+int main() {
+    int n, e;
+    printf("Enter number of vertices: \\n");
+    scanf("%d", &n);
+    printf("Enter number of edges: \\n");
+    scanf("%d", &e);
 
-int main(void)
-{
-    int V, E;
-    printf("Enter number of vertices (max %d): \\n", MAX);
-    scanf("%d", &V);
-
-    if (V <= 0 || V > MAX) {
-        printf("Invalid number of vertices\\n");
-        return 0;
+    // Initialize arrays
+    for (int i = 0; i < n; i++) {
+        visited[i] = 0;
+        for (int j = 0; j < n; j++)
+            adj[i][j] = 0;
     }
 
-    int adj[MAX][MAX];
-    int deg[MAX];
-    int indeg[MAX];
-
-    for (int i = 0; i < V; ++i) {
-        deg[i] = indeg[i] = 0;
-    }
-
-    printf("Enter number of directed edges: \\n");
-    scanf("%d", &E);
-
-    printf("Enter edges as pairs: src dest (0-based labels)\\n");
-    for (int i = 0; i < E; ++i) {
+    for (int i = 0; i < e; i++) {
         int u, v;
+        printf("Enter edge (u v): \\n");
         scanf("%d %d", &u, &v);
-        adj[u][deg[u]++] = v;
-        indeg[v]++;
+        addEdge(u, v);
     }
 
-    Queue q;
-    initQueue(&q);
-
-    for (int i = 0; i < V; ++i)
-        if (indeg[i] == 0) enqueue(&q, i);
-
-    int visited = 0;
-    printf("Topological order:\\n");
-    while (!isEmpty(&q)) {
-        int u = dequeue(&q);
-        printf("%d ", u);
-        visited++;
-
-        for (int k = 0; k < deg[u]; ++k) {
-            int v = adj[u][k];
-            if (--indeg[v] == 0)
-                enqueue(&q, v);
-        }
-    }
-    putchar('\\n');
-
-    if (visited != V)
-        printf("Graph has a cycle! No topological ordering.\\n");
+    topoSort(n);
 
     return 0;
+}
+
+void addEdge(int u, int v) {
+    adj[u][v] = 1;
+}
+
+void topoSort(int n) {
+    for (int i = 0; i < n; i++) {
+        if (!visited[i]) {
+            dfs(i, n);
+        }
+    }
+
+    printf("Topo: ");
+    while (top >= 0)
+        printf("%d ", stack[top--]);
+    printf("\\n");
+}
+
+void dfs(int u, int n) {
+    visited[u] = 1;
+    for (int v = 0; v < n; v++) {
+        if (adj[u][v] && !visited[v])
+            dfs(v, n);
+    }
+    stack[++top] = u;
 }
 `,
     cpp: `
@@ -214,7 +181,7 @@ int main() {
             indeg[v]--;
             if (indeg[v] == 0) {
                 q.push(v);
-            }
+        }
         }
     }
 

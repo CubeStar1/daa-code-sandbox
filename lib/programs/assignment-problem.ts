@@ -85,86 +85,44 @@ The Branch and Bound approach explores a state-space tree where each level repre
   code: {
     c: `
 #include <stdio.h>
-#include <stdbool.h>
 #include <limits.h>
-#include <string.h>
 
-#define MAX_N 10
-#define INF INT_MAX
+#define N 10
 
-int n_ap;
-int cost_matrix_ap[MAX_N][MAX_N];
-int current_assignment_ap[MAX_N];
-int final_assignment_ap[MAX_N];
-bool task_assigned_ap[MAX_N];
-int min_total_cost_ap = INF;
+int n;
+int cost[N][N];
+int visited[N];
+int minCost = INT_MAX;
 
-
-void solve_assignment_recursive(int worker_idx, int current_path_cost) {
-    if (worker_idx == n_ap) {
-        if (current_path_cost < min_total_cost_ap) {
-            min_total_cost_ap = current_path_cost;
-            for (int i = 0; i < n_ap; i++) {
-                final_assignment_ap[i] = current_assignment_ap[i];
-            }
-        }
+void assignTasks(int level, int currentCost) {
+    if (level == n) {
+        if (currentCost < minCost)
+            minCost = currentCost;
         return;
     }
 
-    if (current_path_cost >= min_total_cost_ap) {
-        return;
-    }
-
-    for (int task_idx = 0; task_idx < n_ap; task_idx++) {
-        if (!task_assigned_ap[task_idx]) {
-            task_assigned_ap[task_idx] = true;
-            current_assignment_ap[worker_idx] = task_idx;
-            
-            int new_cost = current_path_cost + cost_matrix_ap[worker_idx][task_idx];
-
-            if (new_cost < min_total_cost_ap) {
-                 solve_assignment_recursive(worker_idx + 1, new_cost);
-            }
-
-            task_assigned_ap[task_idx] = false;
-            current_assignment_ap[worker_idx] = -1;
+    for (int i = 0; i < n; i++) {
+        if (!visited[i]) {
+            visited[i] = 1;
+            assignTasks(level + 1, currentCost + cost[level][i]);
+            visited[i] = 0;
         }
     }
 }
 
 int main() {
-    printf("Enter the number of workers/tasks (N, max %d): ", MAX_N);
-    scanf("%d", &n_ap);
+    printf("Enter number of agents/tasks: \\n");
+    scanf("%d", &n);
 
-    if (n_ap <= 0 || n_ap > MAX_N) {
-        printf("Invalid N.\\n");
-        return 1;
-    }
+    printf("Enter cost matrix (%d x %d):\\n", n, n);
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            scanf("%d", &cost[i][j]);
+    
 
-    printf("Enter the cost matrix (%d x %d) for MINIMUM cost assignment:\\n", n_ap, n_ap);
-    for (int i = 0; i < n_ap; i++) {
-        for (int j = 0; j < n_ap; j++) {
-            scanf("%d", &cost_matrix_ap[i][j]);
-             if (cost_matrix_ap[i][j] == 99999) cost_matrix_ap[i][j] = INF;
-        }
-    }
+    assignTasks(0, 0);
 
-    memset(task_assigned_ap, false, sizeof(task_assigned_ap));
-    memset(current_assignment_ap, -1, sizeof(current_assignment_ap));
-    min_total_cost_ap = INF;
-
-    solve_assignment_recursive(0, 0);
-
-    if (min_total_cost_ap == INF) {
-        printf("No valid assignment found or error in input.\\n");
-    } else {
-        printf("Optimal Assignments:\\n");
-        for (int i = 0; i < n_ap; i++) {
-            printf("Worker %d -> Task %d (Cost: %d)\\n", i, final_assignment_ap[i], cost_matrix_ap[i][final_assignment_ap[i]]);
-        }
-        printf("Minimum Total Cost: %d\\n", min_total_cost_ap);
-    }
-
+    printf("Minimum Assignment Cost: %d\\n", minCost);
     return 0;
 }
 `,
@@ -211,7 +169,7 @@ void solve_assignment_recursive(int worker_idx, int current_path_cost) {
 }
 
 int main() {
-    cout << "Enter the number of workers/tasks (N): ";
+    cout << "Enter the number of workers/tasks (N): \\n";
     cin >> n_ap;
 
     if (n_ap <= 0) {
@@ -249,5 +207,5 @@ int main() {
 }
 `
   },
-sampleInput: "Number of tasks/workers (N): 3\nCost Matrix:\n25 10 15\n10 30 5\n20 10 35",
+sampleInput: "3\n25 10 15\n10 30 5\n20 10 35",
 };

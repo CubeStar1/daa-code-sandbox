@@ -93,97 +93,65 @@ If an adjacency list were used, it would be O(V+E).
   code: {
     c: `
 #include <stdio.h>
-#include <limits.h> 
-#include <stdbool.h> 
+#include <limits.h>
 
-#define MAX_VERTICES 100
-#define INF INT_MAX 
+#define MAX 100
+#define INF 99999
 
-int minKey(int key[], bool mstSet[], int V) {
-    int min = INF, min_index = -1;
+int minKey(int key[], int mstSet[], int n) {
+    int min = INF, min_index;
 
-    for (int v = 0; v < V; v++) {
-        if (mstSet[v] == false && key[v] < min) {
-            min = key[v];
-            min_index = v;
-        }
-    }
+    for (int v = 0; v < n; v++)
+        if (mstSet[v] == 0 && key[v] < min)
+            min = key[v], min_index = v;
+
     return min_index;
 }
 
-void printMST(int parent[], int graph[MAX_VERTICES][MAX_VERTICES], int V) {
-    printf("Edge   Weight\\n");
-    for (int i = 1; i < V; i++) { 
-        if (parent[i] < 0 || parent[i] >= V) {
-            printf("Error: Invalid parent for vertex %d\\n", i);
-            continue;
-        }
-         if (graph[i][parent[i]] == 0 && i != parent[i]) {
-         }
-        printf("%d - %d    %d \\n", parent[i], i, graph[i][parent[i]]);
-    }
-}
+void primMST(int graph[MAX][MAX], int n) {
+    int parent[MAX]; 
+    int key[MAX];     
+    int mstSet[MAX]; 
 
-void primMST(int graph[MAX_VERTICES][MAX_VERTICES], int V) {
-    int parent[MAX_VERTICES]; 
-    int key[MAX_VERTICES];    
-    bool mstSet[MAX_VERTICES]; 
-
-    for (int i = 0; i < V; i++) {
+    
+    for (int i = 0; i < n; i++) {
         key[i] = INF;
-        mstSet[i] = false;
-        parent[i] = -1; 
+        mstSet[i] = 0;
     }
 
-    key[0] = 0;     
+    key[0] = 0; 
+    parent[0] = -1;
 
-    for (int count = 0; count < V; count++) {
-        int u = minKey(key, mstSet, V);
-        
-        if (u == -1) {
-            if (count < V && V > 0) { 
-                 bool all_in_mst = true;
-                 for(int k=0; k<V; ++k) if(!mstSet[k]) all_in_mst = false;
-                 if(!all_in_mst) printf("Graph might be disconnected. MST construction stopped.\\n");
-            }
-            break;
-        }
+    for (int count = 0; count < n - 1; count++) {
+        int u = minKey(key, mstSet, n);
+        mstSet[u] = 1;
 
-        mstSet[u] = true;
-
-        for (int v = 0; v < V; v++) {
-
-            if (graph[u][v] != 0 && mstSet[v] == false && graph[u][v] < key[v]) {
+        for (int v = 0; v < n; v++)
+            if (graph[u][v] && mstSet[v] == 0 && graph[u][v] < key[v]) {
                 parent[v] = u;
                 key[v] = graph[u][v];
             }
-        }
     }
 
-    printMST(parent, graph, V);
+    
+    printf("Edge \\tWeight\\n");
+    for (int i = 1; i < n; i++)
+        printf("%d - %d \\t%d\\n", parent[i], i, graph[i][parent[i]]);
 }
 
-int main(void) {
-    int V; 
-    int graph[MAX_VERTICES][MAX_VERTICES];
+int main() {
+    int n;
+    int graph[MAX][MAX];
 
-    printf("Enter the number of vertices (max %d): \\n", MAX_VERTICES);
-    scanf("%d", &V);
+    printf("Enter number of vertices: \\n");
+    scanf("%d", &n);
 
-    if (V <= 0 || V > MAX_VERTICES) {
-        printf("Invalid number of vertices.\\n");
-        return 1;
-    }
-
-    printf("Enter the adjacency matrix for the graph (%d x %d):\\n", V, V);
-    printf("(Use 0 for no direct edge between different vertices, or actual weight. Self-loops are usually 0 or ignored):\\n");
-    for (int i = 0; i < V; i++) {
-        for (int j = 0; j < V; j++) {
+    printf("Enter adjacency matrix (0 if no edge):\\n");
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
             scanf("%d", &graph[i][j]);
-        }
-    }
 
-    primMST(graph, V);
+    primMST(graph, n);
 
     return 0;
 }

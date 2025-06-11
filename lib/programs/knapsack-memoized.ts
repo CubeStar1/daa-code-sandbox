@@ -104,75 +104,42 @@ Therefore, the overall space complexity is dominated by the memoization table, r
   code: {
     c: `
 #include <stdio.h>
-#include <string.h> 
 
-#define MAX_ITEMS 100
-#define MAX_CAPACITY 1000
+#define MAX 100
+#define NIL -1
 
-int dp[MAX_ITEMS][MAX_CAPACITY + 1];
+int dp[MAX][MAX];
 
-int max(int a, int b) {
-    return (a > b) ? a : b;
-}
-
-int knapsack_memoized(int weights[], int values[], int index, int capacity, int n) {
-    if (capacity < 0) {
-        return -1e9;
-    }
-    if (index == n || capacity == 0) {
+int knapsack(int W, int wt[], int val[], int n) {
+    if (n == 0 || W == 0)
         return 0;
-    }
 
-    if (dp[index][capacity] != -1) {
-        return dp[index][capacity];
-    }
+    
+    if (dp[n][W] != NIL)
+        return dp[n][W];
 
-    int exclude_item_value = knapsack_memoized(weights, values, index + 1, capacity, n);
+    
+    if (wt[n - 1] > W)
+        return dp[n][W] = knapsack(W, wt, val, n - 1);
 
-    int include_item_value = -1e9;
-    if (weights[index] <= capacity) {
-        include_item_value = values[index] + knapsack_memoized(weights, values, index + 1, capacity - weights[index], n);
-    }
-    return dp[index][capacity] = max(exclude_item_value, include_item_value);
+    int include = val[n - 1] + knapsack(W - wt[n - 1], wt, val, n - 1);
+    int exclude = knapsack(W, wt, val, n - 1);
+
+    return dp[n][W] = (include > exclude) ? include : exclude;
 }
 
-int main(void) {
-    int n, W;
-    int weights[MAX_ITEMS];
-    int values[MAX_ITEMS];
+int main() {
+    int val[] = {60, 100, 120};
+    int wt[] = {10, 20, 30};
+    int W = 50;       
+    int n = sizeof(val) / sizeof(val[0]);
 
-    printf("Enter number of items (max %d): \\n", MAX_ITEMS);
-    scanf("%d", &n);
+    for (int i = 0; i <= n; i++)
+        for (int w = 0; w <= W; w++)
+            dp[i][w] = NIL;
 
-    if (n <= 0 || n > MAX_ITEMS) {
-        printf("Invalid number of items.\\n");
-        return 1;
-    }
-
-    printf("Enter knapsack capacity (max %d): \\n", MAX_CAPACITY);
-    scanf("%d", &W);
-
-    if (W < 0 || W > MAX_CAPACITY) {
-        printf("Invalid knapsack capacity.\\n");
-        return 1;
-    }
-
-    printf("Enter weight and value of each item (weight value):\\n");
-    for (int i = 0; i < n; ++i) {
-        printf("Item %d: ", i + 1);
-        scanf("%d %d", &weights[i], &values[i]);
-    }
-
-
-    for (int i = 0; i < n; ++i) {
-        for (int j = 0; j <= W; ++j) {
-            dp[i][j] = -1;
-        }
-    }
-
-    int max_value = knapsack_memoized(weights, values, 0, W, n);
-
-    printf("Maximum value that can be obtained = %d\\n", max_value);
+    int result = knapsack(W, wt, val, n);
+    printf("Maximum value in Knapsack = %d\\n", result);
 
     return 0;
 }

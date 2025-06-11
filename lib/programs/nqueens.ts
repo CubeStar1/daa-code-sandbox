@@ -81,63 +81,63 @@ The N-Queens problem is typically solved using a backtracking algorithm. The alg
   code: {
     c: `
 #include <stdio.h>
-#include <string.h>          
+#include <math.h>
 
-#define MAXN  15             
+#define MAX 20
 
-int N;
-int board[MAXN];             
-int cols [MAXN];
-int diag1[2*MAXN];           
-int diag2[2*MAXN];           
-int done = 0;                
+int board[MAX], count = 0;
 
-void printBoard(void)
-{
-    for (int r = 0; r < N; ++r) {
-        for (int c = 0; c < N; ++c)
-            putchar(board[r] == c ? 'Q' : '.');
-        putchar('\\n');
+int isSafe(int row, int col) {
+    for (int i = 1; i < row; i++) {
+        if (board[i] == col || abs(board[i] - col) == abs(i - row))
+            return 0;
     }
-    putchar('\\n');
+    return 1;
 }
 
-void solve(int r)
-{
-    if (done) return;                 
-
-    if (r == N) {                     
-        printBoard();
-        done = 1;                     
-        return;
-    }
-    for (int c = 0; c < N; ++c) {
-        if (cols[c] || diag1[r - c + N] || diag2[r + c]) continue;
-
-        board[r] = c;
-        cols[c] = diag1[r - c + N] = diag2[r + c] = 1;
-
-        solve(r + 1);                
-
-        cols[c] = diag1[r - c + N] = diag2[r + c] = 0;
+void printSolution(int n) {
+    count++;
+    printf("\\nSolution %d:\\n", count);
+    for (int i = 1; i <= n; i++) {
+        for (int j = 1; j <= n; j++) {
+            if (board[i] == j)
+                printf(" Q ");
+            else
+                printf(" . ");
+        }
+        printf("\\n");
     }
 }
 
-int main(void)
-{
-    printf("Enter N (<= %d): \\n", MAXN);
-    if (scanf("%d", &N) != 1 || N < 1 || N > MAXN) {
-        puts("Invalid N");
-        return 0;
+void solve(int row, int n) {
+    for (int col = 1; col <= n; col++) {
+        if (isSafe(row, col)) {
+            board[row] = col;
+            if (row == n)
+                printSolution(n);
+            else
+                solve(row + 1, n);
+        }
     }
-    memset(cols, 0, sizeof(cols));
-    memset(diag1, 0, sizeof(diag1));
-    memset(diag2, 0, sizeof(diag2));
+}
 
-    puts("\\nOne solution to the N-Queens problem:");
-    solve(0);
+int main() {
+    int n;
+    printf("Enter the value of N (1–20): \\n");
+    scanf("%d", &n);
 
-    if (!done) puts("\\nNo solution (N = 2 or 3).");
+    if (n < 1 || n > MAX) {
+        printf("Invalid N value. Please enter between 1 and %d\\n", MAX);
+        return 1;
+    }
+
+    solve(1, n);
+
+    if (count == 0)
+        printf("No solutions found.\\n");
+    else
+        printf("\\nTotal solutions: %d\\n", count);
+
     return 0;
 }
   `,

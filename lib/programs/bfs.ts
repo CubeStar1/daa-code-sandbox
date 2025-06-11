@@ -118,10 +118,10 @@ Queue* createQueue() {
 int isEmpty(Queue* q) {
     return q->rear == -1;
 }
+
 void enqueue(Queue* q, int value) {
-    if (q->rear == MAX_VERTICES - 1)
-        printf("Queue is full!!\\n");
-    else {
+    if (q->rear == MAX_VERTICES - 1) {
+    } else {
         if (q->front == -1)
             q->front = 0;
         q->rear++;
@@ -132,7 +132,6 @@ void enqueue(Queue* q, int value) {
 int dequeue(Queue* q) {
     int item;
     if (isEmpty(q)) {
-        printf("Queue is empty!!\\n");
         item = -1;
     } else {
         item = q->items[q->front];
@@ -144,35 +143,18 @@ int dequeue(Queue* q) {
     return item;
 }
 
-typedef struct {
-    int adj[MAX_VERTICES][MAX_VERTICES];
-    int numVertices;
-} Graph;
-Graph* createGraph(int vertices) {
-    Graph* graph = (Graph*)malloc(sizeof(Graph));
-    graph->numVertices = vertices;
-
-    for (int i = 0; i < vertices; i++) {
-        for (int j = 0; j < vertices; j++) {
-            graph->adj[i][j] = 0;
-        }
-    }
-    return graph;
+void addEdge(int adj[MAX_VERTICES][MAX_VERTICES], int src, int dest) {
+    adj[src][dest] = 1;
+    adj[dest][src] = 1; // For undirected graph
 }
 
-void addEdge(Graph* graph, int src, int dest) {
-    graph->adj[src][dest] = 1;
-    graph->adj[dest][src] = 1;
-}
-
-void bfs(Graph* graph, int startVertex) {
+void bfs(int adj[MAX_VERTICES][MAX_VERTICES], int numVertices, int startVertex) {
     Queue* q = createQueue();
+    
+    // visited array to keep track of visited nodes
+    int visited[MAX_VERTICES] = {0};
 
-    int visited[MAX_VERTICES];
-    for (int i = 0; i < graph->numVertices; i++) {
-        visited[i] = 0;
-    }
-
+    // Mark the starting node as visited and enqueue it
     visited[startVertex] = 1;
     enqueue(q, startVertex);
 
@@ -182,8 +164,10 @@ void bfs(Graph* graph, int startVertex) {
         int currentVertex = dequeue(q);
         printf("%d ", currentVertex);
 
-        for (int i = 0; i < graph->numVertices; i++) {
-            if (graph->adj[currentVertex][i] == 1 && visited[i] == 0) {
+        // Get all adjacent vertices of the dequeued vertex currentVertex
+        // If an adjacent has not been visited, then mark it visited and enqueue it
+        for (int i = 0; i < numVertices; i++) {
+            if (adj[currentVertex][i] == 1 && visited[i] == 0) {
                 visited[i] = 1;
                 enqueue(q, i);
             }
@@ -195,15 +179,17 @@ void bfs(Graph* graph, int startVertex) {
 
 int main() {
     int V, E, startNode;
+    int adj[MAX_VERTICES][MAX_VERTICES];
+
     printf("Enter the number of vertices (max %d): \\n", MAX_VERTICES);
     scanf("%d", &V);
-
-    if (V <= 0 || V > MAX_VERTICES) {
-        printf("Invalid number of vertices.\\n");
-        return 1;
+    
+    // Initialize adjacency matrix to 0
+    for (int i = 0; i < V; i++) {
+        for (int j = 0; j < V; j++) {
+            adj[i][j] = 0;
+        }
     }
-
-    Graph* graph = createGraph(V);
 
     printf("Enter the number of edges: \\n");
     scanf("%d", &E);
@@ -212,81 +198,68 @@ int main() {
     for (int i = 0; i < E; i++) {
         int src, dest;
         scanf("%d %d", &src, &dest);
-        if (src >= 0 && src < V && dest >= 0 && dest < V) {
-            addEdge(graph, src, dest);
-        } else {
-            printf("Invalid edge: (%d, %d). Vertices out of bound.\\n", src, dest);
-            i--;
-        }
+        addEdge(adj, src, dest);
     }
 
     printf("Enter the starting node for BFS (0 to %d): \\n", V - 1);
     scanf("%d", &startNode);
 
-    if (startNode < 0 || startNode >= V) {
-        printf("Invalid starting node.\\n");
-        free(graph);
-        return 1;
-    }
+    bfs(adj, V, startNode);
 
-    bfs(graph, startNode);
-
-    free(graph);
     return 0;
 }
 `,
-    cpp: `
-#include <bits/stdc++.h>
+    cpp:
+`#include <iostream>
+#include <vector>
+#include <queue>
+
 using namespace std;
 
-class Graph {
-    int V;
-    vector<vector<int>> adj;
+void addEdge(vector<vector<int>>& adj, int u, int v) {
+    adj[u][v] = 1;
+    adj[v][u] = 1; // For an undirected graph
+}
 
-public:
-    Graph(int V) : V(V), adj(V) {}
+void bfs(const vector<vector<int>>& adj, int startNode) {
+    int V = adj.size();
+    vector<bool> visited(V, false);
+    queue<int> q;
 
-    void addEdge(int v, int w) {
-        adj[v].push_back(w);
-        adj[w].push_back(v); 
-    }
+    visited[startNode] = true;
+    q.push(startNode);
 
-    void BFS(int s) {
-        vector<bool> visited(V, false);
-        queue<int> q;
+    cout << "Breadth First Traversal (starting from vertex " << startNode << "):" << endl;
 
-        visited[s] = true;
-        q.push(s);
+    while (!q.empty()) {
+        int u = q.front();
+        cout << u << " ";
+        q.pop();
 
-        cout << "Breadth First Traversal (starting from vertex " << s << "):" << endl;
-
-        while (!q.empty()) {
-            s = q.front();
-            cout << s << " ";
-            q.pop();
-
-            for (int adjacent : adj[s]) {
-                if (!visited[adjacent]) {
-                    visited[adjacent] = true;
-                    q.push(adjacent);
-                }
+        // Find all adjacent vertices of u
+        for (int v = 0; v < V; ++v) {
+            // If an adjacent has not been visited, then mark it visited and enqueue it
+            if (adj[u][v] == 1 && !visited[v]) {
+                visited[v] = true;
+                q.push(v);
             }
         }
-        cout << endl;
     }
-};
+    cout << endl;
+}
 
 int main() {
+    // Fast I/O
+    ios_base::sync_with_stdio(false);
+    cin.tie(NULL);
+
     int V, E, startNode;
+
     cout << "Enter the number of vertices: ";
     cin >> V;
 
-    if (V <= 0) {
-        cout << "Invalid number of vertices." << endl;
-        return 1;
-    }
-
-    Graph g(V);
+    // Adjacency matrix
+    vector<vector<int>> adj(V, vector<int>(V, 0));
 
     cout << "Enter the number of edges: ";
     cin >> E;
@@ -295,20 +268,16 @@ int main() {
     for (int i = 0; i < E; ++i) {
         int u, v;
         cin >> u >> v;
-        g.addEdge(u, v);
+        addEdge(adj, u, v);
     }
 
     cout << "Enter the starting vertex for BFS: ";
     cin >> startNode;
 
-    if (startNode >= 0 && startNode < V) {
-        g.BFS(startNode);
-    } else {
-        std::cout << "Invalid starting vertex." << std::endl;
-    }
+    bfs(adj, startNode);
 
     return 0;
 }
 `,
-    },
+  },
 }

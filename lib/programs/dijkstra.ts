@@ -95,97 +95,67 @@ If an adjacency list were used, it would be O(V+E).
   code: {
     c: `
 #include <stdio.h>
-#include <limits.h> 
-#include <stdbool.h> 
-
-#define MAX_VERTICES 100 
 #define INF 99999
+#define MAX 100
 
-int minDistance(int dist[], bool sptSet[], int V) {
-    int min = INF, min_index = -1;
 
-    for (int v = 0; v < V; v++) {
-        if (sptSet[v] == false && dist[v] <= min) {
-            min = dist[v];
-            min_index = v;
+int main() {
+    int n, src;
+    int graph[MAX][MAX];
+
+    printf("Enter number of vertices: ");
+    scanf("%d", &n);
+
+    printf("Enter the adjacency matrix (0 if no edge, use INF = %d for no path):\\n", INF);
+    for (int i = 0; i < n; i++)
+        for (int j = 0; j < n; j++)
+            scanf("%d", &graph[i][j]);
+
+    printf("Enter source vertex (0 to %d): \\n", n - 1);
+    scanf("%d", &src);
+
+    dijkstra(graph, n, src);
+    return 0;
+}
+void dijkstra(int graph[MAX][MAX],int n, int src)
+{
+    int dist[MAX];
+    int visited[MAX];
+    
+    for(int i=0;i<n;i++)
+    {
+        dist[i]=INF;
+        visited[i]=0;
+    }
+    dist[src]=0;
+    for(int j=0;j<n-1;j++)
+    {
+        int u=minDist(dist,visited,n);
+        visited[u]=1;
+
+        for(int v=0;v<n;v++)
+        {
+            if(!visited[v]&&graph[u][v]&&dist[u]!=INF&&dist[u]+graph[u][v]<dist[v])
+                dist[v]=dist[u]+graph[u][v];
+        }
+    }
+    printf("Vertex \\t Distance from Source %d\\n", src);
+    for (int i = 0; i < n; i++)
+        printf("%d \\t\\t %d\\n", i, dist[i]);
+}
+
+int minDist(int dist[], int visited[],int n)
+{
+    int min=INF,min_index;
+    for(int v=0;v<n;v++)
+    {
+        if(!visited[v]&&dist[v]<min)
+        {
+            min=dist[v];
+            min_index=v;
         }
     }
     return min_index;
-}
-
-void printSolution(int dist[], int V, int src) {
-    printf("Vertex   Distance from Source %d\\n", src);
-    for (int i = 0; i < V; i++) {
-        if (dist[i] == INF) {
-            printf("%d \\t\\t %s\\n", i, "INF");
-        } else {
-            printf("%d \\t\\t %d\\n", i, dist[i]);
-        }
-    }
-}
-
-void dijkstra(int graph[MAX_VERTICES][MAX_VERTICES], int src, int V) {
-    int dist[MAX_VERTICES];
-
-    bool sptSet[MAX_VERTICES];
-
-    for (int i = 0; i < V; i++) {
-        dist[i] = INF;
-        sptSet[i] = false;
-    }
-
-    dist[src] = 0;
-
-    for (int count = 0; count < V - 1; count++) {
-        int u = minDistance(dist, sptSet, V);
-        
-        if (u == -1) break;
-
-        sptSet[u] = true;
-
-        for (int v = 0; v < V; v++) {
-            if (!sptSet[v] && graph[u][v] && dist[u] != INF &&
-                dist[u] + graph[u][v] < dist[v]) {
-                dist[v] = dist[u] + graph[u][v];
-            }
-        }
-    }
-
-    printSolution(dist, V, src);
-}
-
-int main(void) {
-    int V;
-    int graph[MAX_VERTICES][MAX_VERTICES];
-    int src_vertex;
-
-    printf("Enter the number of vertices (max %d): \\n", MAX_VERTICES);
-    scanf("%d", &V);
-
-    if (V <= 0 || V > MAX_VERTICES) {
-        printf("Invalid number of vertices.\\n");
-        return 1;
-    }
-
-    printf("Enter the adjacency matrix for the graph (%d x %d):\\n", V, V);
-    printf("(Use %d for infinity/no direct path, 0 for self-loops if no weight):\\n", INF);
-    for (int i = 0; i < V; i++) {
-        for (int j = 0; j < V; j++) {
-            scanf("%d", &graph[i][j]);
-        }
-    }
-
-    printf("Enter the source vertex (0 to %d): \\n", V - 1);
-    scanf("%d", &src_vertex);
-
-    if (src_vertex < 0 || src_vertex >= V) {
-        printf("Invalid source vertex.\\n");
-        return 1;
-    }
-
-    dijkstra(graph, src_vertex, V);
-
-    return 0;
 }
   `,
     cpp: `

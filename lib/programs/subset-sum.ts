@@ -91,56 +91,49 @@ Note: The Subset Sum problem is NP-complete. While this backtracking solution is
     c: `
 #include <stdio.h>
 
-#define MAX  30                 
+#define MAX 100
 
-int n, M;                       
-int w[MAX];                     
-int x[MAX];                     
+int found = 0;
 
-void printSubset(void)          
-{
-    printf("{ ");
-    for (int i = 0; i < n; ++i)
-        if (x[i]) printf("%d ", w[i]);
-    puts("}");
-}
-
-void sumSubset(int i, int currSum, int remSum)
-{
-    if (currSum == M) {         
-        printSubset();
-        return;                 
+void subsetSum(int arr[], int n, int index, int target, int subset[], int subIndex) {
+    if (target == 0) {
+        found = 1;
+        printf("Subset: \\n");
+        for (int i = 0; i < subIndex; i++)
+            printf("%d ", subset[i]);
+        printf("\\n");
+        return;
     }
-    if (i == n || currSum + remSum < M)  
+
+    if (index == n || target < 0)
         return;
 
-    if (currSum + w[i] <= M) {
-        x[i] = 1;
-        sumSubset(i + 1, currSum + w[i], remSum - w[i]);
-    }
+    // Include current element
+    subset[subIndex] = arr[index];
+    subsetSum(arr, n, index + 1, target - arr[index], subset, subIndex + 1);
 
-    x[i] = 0;
-    sumSubset(i + 1, currSum, remSum - w[i]);
+    // Exclude current element
+    subsetSum(arr, n, index + 1, target, subset, subIndex);
 }
 
-int main(void)
-{
-    printf("Enter number of items (≤ %d): ", MAX);
+int main() {
+    int n, target;
+    int arr[MAX], subset[MAX];
+
+    printf("Enter number of elements: \\n");
     scanf("%d", &n);
 
-    printf("Enter target sum M: ");
-    scanf("%d", &M);
+    printf("Enter elements: \\n");
+    for (int i = 0; i < n; i++)
+        scanf("%d", &arr[i]);
 
-    puts("Enter each item's weight:");
-    int total = 0;
-    for (int i = 0; i < n; ++i) {
-        scanf("%d", &w[i]);
-        total += w[i];
-        x[i] = 0;               
-    }
+    printf("Enter target sum: \\n");
+    scanf("%d", &target);
 
-    puts("\\nSubsets summing to M:");
-    sumSubset(0, 0, total);
+    subsetSum(arr, n, 0, target, subset, 0);
+
+    if (!found)
+        printf("No subset found with sum %d\\n", target);
 
     return 0;
 }
