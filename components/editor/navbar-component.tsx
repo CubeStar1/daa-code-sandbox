@@ -14,6 +14,7 @@ import Image from "next/image";
 
 const NavbarComponent: React.FC = () => {
   const router = useRouter();
+  const icon = process.env.NEXT_PUBLIC_APP_LOGO!;
   const {
     problems,
     currentProblem,
@@ -28,28 +29,28 @@ const NavbarComponent: React.FC = () => {
   const handleProblemChange = (problemId: string) => {
     const problem = navigateToProblem(problemId);
     if (problem) {
-      router.push(`/editor/${problem.slug}`);
+      router.push(`/problems/${problem.slug}`);
     }
   };
 
   const handleNextProblem = () => {
     const nextProblem = navigateToNext();
     if (nextProblem) {
-      router.push(`/editor/${nextProblem.slug}`);
+      router.push(`/problems/${nextProblem.slug}`);
     }
   };
 
   const handlePreviousProblem = () => {
     const prevProblem = navigateToPrevious();
     if (prevProblem) {
-      router.push(`/editor/${prevProblem.slug}`);
+      router.push(`/problems/${prevProblem.slug}`);
     }
   };
 
   const handleRandomProblem = () => {
     const randomProblem = navigateToRandom();
     if (randomProblem) {
-      router.push(`/editor/${randomProblem.slug}`);
+      router.push(`/problems/${randomProblem.slug}`);
     }
   };
 
@@ -60,7 +61,7 @@ const NavbarComponent: React.FC = () => {
       <div className="flex items-center justify-between px-4 h-12">
         <div className="flex items-center gap-3">
           <div className="flex items-center gap-2">
-            <Image src="/code-sandbox-logo.png" alt="CodeSandbox Logo" width={24} height={24} />
+            <Image src={icon} alt="CodeSandbox Logo" width={24} height={24} />
             <h1 className="text-lg font-semibold hidden sm:block">LeetCode Assistant</h1>
           </div>
           

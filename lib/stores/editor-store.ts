@@ -73,7 +73,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   // Initial state
   currentProblem: null,
   problems: [],
-  selectedLanguage: 'python',
+  selectedLanguage: 'cpp',
   code: '',
   input: '',
   output: '',

@@ -71,19 +71,19 @@ export default function ProblemEditor() {
           event.preventDefault()
           const nextProblem = navigateToNext()
           if (nextProblem) {
-            router.push(`/editor/${nextProblem.slug}`)
+            router.push(`/problems/${nextProblem.slug}`)
           }
         } else if (event.key === 'ArrowLeft') {
           event.preventDefault()
           const prevProblem = navigateToPrevious()
           if (prevProblem) {
-            router.push(`/editor/${prevProblem.slug}`)
+            router.push(`/problems/${prevProblem.slug}`)
           }
         } else if (event.key === 'r') {
           event.preventDefault()
           const randomProblem = navigateToRandom()
           if (randomProblem) {
-            router.push(`/editor/${randomProblem.slug}`)
+            router.push(`/problems/${randomProblem.slug}`)
           }
         }
       }
