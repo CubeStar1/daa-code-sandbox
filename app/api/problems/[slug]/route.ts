@@ -50,7 +50,6 @@ export async function GET(
 
     if (officialEditorial) {
       editorial = officialEditorial
-      console.log('Found official editorial for problem:', problem.slug)
     } else {
       // If no official editorial, get any editorial for this problem
       const { data: anyEditorial } = await supabase
@@ -62,11 +61,6 @@ export async function GET(
         .single()
       
       editorial = anyEditorial
-      if (editorial) {
-        console.log('Found unofficial editorial for problem:', problem.slug)
-      } else {
-        console.log('No editorial found for problem:', problem.slug)
-      }
     }
 
     // Get user stats if user is provided

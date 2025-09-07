@@ -32,8 +32,6 @@ export function ComplexityAnalysis({ problem }: ComplexityAnalysisProps) {
     return languageMap[lang] || lang
   }
 
-  console.log(problem)
-
   if (!editorial) {
     return (
       <div className="h-full p-4 flex items-center justify-center">

@@ -15,6 +15,7 @@ import { useToast } from "@/components/ui/use-toast"
 import { Toaster } from "@/components/ui/toaster"
 import { Skeleton } from "@/components/ui/skeleton"
 import useUser from "@/hooks/use-user"
+import Chat from "@/components/editor/chat"
 type Params = Promise<{ slug: string }>
 
 export default function ProblemEditor(props: { params: Params }) {
@@ -192,7 +193,7 @@ export default function ProblemEditor(props: { params: Params }) {
 
               <ResizableHandle withHandle className="my-1 bg-background hover:bg-[var(--color-section-splitter)] transition-all"/>
 
-              <ResizablePanel defaultSize={70} className="">
+              <ResizablePanel defaultSize={50} className="">
                 <ResizablePanelGroup direction="vertical" className="gap-1">
                   <ResizablePanel defaultSize={70} className="border rounded-lg">
                     <div className="h-full">
@@ -208,6 +209,12 @@ export default function ProblemEditor(props: { params: Params }) {
                     </div>
                   </ResizablePanel>
                 </ResizablePanelGroup>
+              </ResizablePanel>
+              
+              <ResizableHandle withHandle className="my-1 bg-background hover:bg-[var(--color-section-splitter)] transition-all"/>
+
+              <ResizablePanel defaultSize={20} className="border rounded-lg">
+                <Chat />
               </ResizablePanel>
             </ResizablePanelGroup>
           )}

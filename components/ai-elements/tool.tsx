@@ -18,6 +18,7 @@ import {
 } from 'lucide-react';
 import type { ComponentProps, ReactNode } from 'react';
 import { CodeBlock } from './code-block';
+import { Response } from './response';
 
 export type ToolProps = ComponentProps<typeof Collapsible>;
 
