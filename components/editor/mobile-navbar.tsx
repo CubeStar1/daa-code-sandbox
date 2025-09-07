@@ -1,26 +1,48 @@
 "use client";
 
 import React from 'react';
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useEditorStore } from "@/lib/stores/editor-store";
+import { useProblem, useProblems } from "@/hooks/use-problems-api";
+import { problemNavigation } from "@/lib/utils/problem-navigation";
 import { ProblemSelector } from "@/components/editor/program-selector";
 import { ProviderInfoPopover } from "@/components/editor/provider-info-popover";
 import { ThemeToggle } from "@/components/theme-toggle";
+import useUser from "@/hooks/use-user";
 
 const MobileNavbar: React.FC = () => {
   const router = useRouter();
+  const params = useParams();
+  const slug = params.slug as string;
+  const { data: user } = useUser();
+  
   const {
-    problems,
-    currentProblem,
     executionProvider,
     setExecutionProvider,
-    navigateToProblem
   } = useEditorStore();
 
+  // Get current problem data
+  const { data: problemData } = useProblem({ 
+    slug, 
+    userId: user?.id 
+  });
+
+  // Get all problems for navigation
+  const { data: problemsData } = useProblems({
+    filters: {},
+    sort: { field: 'created_at', direction: 'desc' },
+    page: 1,
+    limit: 100,
+    userId: user?.id
+  });
+
+  const currentProblem = problemData?.problem;
+  const problems = problemsData?.problems || [];
+
   const handleProblemChange = (problemId: string) => {
-    const problem = navigateToProblem(problemId);
+    const problem = problemNavigation.getProblemById(problemId, problems);
     if (problem) {
-      router.push(`/editor/${problem.slug}`);
+      router.push(`/problems/${problem.slug}`);
     }
   };
 

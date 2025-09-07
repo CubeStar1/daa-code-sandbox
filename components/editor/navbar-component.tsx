@@ -1,8 +1,10 @@
 "use client";
 
 import React from 'react';
-import { useRouter } from "next/navigation";
+import { useRouter, useParams } from "next/navigation";
 import { useEditorStore } from "@/lib/stores/editor-store";
+import { useProblem, useProblems } from "@/hooks/use-problems-api";
+import { problemNavigation } from "@/lib/utils/problem-navigation";
 import { ProblemSheet } from "@/components/editor/problem-sheet";
 import { ProviderInfoPopover } from "@/components/editor/provider-info-popover";
 import { ThemeToggle } from "@/components/theme-toggle";
@@ -11,44 +13,64 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { Button } from "@/components/ui/button";
 import { ChevronLeft, ChevronRight, Shuffle } from 'lucide-react';
 import Image from "next/image";
+import useUser from "@/hooks/use-user";
 
 const NavbarComponent: React.FC = () => {
   const router = useRouter();
+  const params = useParams();
+  const slug = params.slug as string;
+  const { data: user } = useUser();
   const icon = process.env.NEXT_PUBLIC_APP_LOGO!;
+  
   const {
-    problems,
-    currentProblem,
     executionProvider,
     setExecutionProvider,
-    navigateToNext,
-    navigateToPrevious,
-    navigateToRandom,
-    navigateToProblem
   } = useEditorStore();
 
+  // Get current problem data
+  const { data: problemData } = useProblem({ 
+    slug, 
+    userId: user?.id 
+  });
+
+  // Get all problems for navigation
+  const { data: problemsData } = useProblems({
+    filters: {},
+    sort: { field: 'created_at', direction: 'desc' },
+    page: 1,
+    limit: 100,
+    userId: user?.id
+  });
+
+  const currentProblem = problemData?.problem;
+  const problems = problemsData?.problems || [];
+
   const handleProblemChange = (problemId: string) => {
-    const problem = navigateToProblem(problemId);
+    const problem = problemNavigation.getProblemById(problemId, problems);
     if (problem) {
       router.push(`/problems/${problem.slug}`);
     }
   };
 
   const handleNextProblem = () => {
-    const nextProblem = navigateToNext();
+    if (!currentProblem) return;
+    const nextProblem = problemNavigation.getNextProblem(currentProblem, problems);
     if (nextProblem) {
       router.push(`/problems/${nextProblem.slug}`);
     }
   };
 
   const handlePreviousProblem = () => {
-    const prevProblem = navigateToPrevious();
+    if (!currentProblem) return;
+    const prevProblem = problemNavigation.getPreviousProblem(currentProblem, problems);
     if (prevProblem) {
       router.push(`/problems/${prevProblem.slug}`);
     }
   };
 
   const handleRandomProblem = () => {
-    const randomProblem = navigateToRandom();
+    if (!currentProblem) return;
+    const randomProblem = problemNavigation.getRandomProblem(currentProblem, problems);
     if (randomProblem) {
       router.push(`/problems/${randomProblem.slug}`);
     }

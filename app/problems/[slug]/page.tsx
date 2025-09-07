@@ -1,10 +1,10 @@
 "use client"
 
-import { useEffect, useState } from "react"
-import { useParams } from "next/navigation"
+import { useEffect, use } from "react"
+import { useRouter } from "next/navigation"
 import { useIsMobile } from "@/hooks/use-mobile"
 import { useEditorStore } from "@/lib/stores/editor-store"
-import { ProblemService } from "@/lib/database-service"
+import { useProblem, useProblems } from "@/hooks/use-problems-api"
 import NavbarComponent from "@/components/editor/navbar-component"
 import MobileNavbar from "@/components/editor/mobile-navbar"
 import { ProblemDetailsTabs } from "@/components/editor/problem-details-tabs"
@@ -14,54 +14,93 @@ import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/componen
 import { useToast } from "@/components/ui/use-toast"
 import { Toaster } from "@/components/ui/toaster"
 import { Skeleton } from "@/components/ui/skeleton"
-import type { Problem, ProgrammingLanguage } from "@/lib/database-types"
 import useUser from "@/hooks/use-user"
-import { useRouter } from "next/navigation"
+type Params = Promise<{ slug: string }>
 
-export default function ProblemEditor() {
+export default function ProblemEditor(props: { params: Params }) {
   const router = useRouter()
-  const params = useParams()
-  const slug = params.slug as string
+  const params = use(props.params)
+  const slug = params.slug;
   const isMobileView = useIsMobile()
   const { toast } = useToast()
+  const { data: user } = useUser()
   
-  const {
-    currentProblem,
-    problems,
-    isLoading,
-    error,
-    loadProblemsData,
-    loadProblemBySlug,
-    navigateToNext,
-    navigateToPrevious,
-    navigateToRandom
-  } = useEditorStore()
+  const { resetForNewProblem } = useEditorStore()
 
-  // Load data on mount and when slug changes
+  // Fetch current problem
+  const { 
+    data: problemData, 
+    isLoading: problemLoading, 
+    error: problemError 
+  } = useProblem({ 
+    slug, 
+    userId: user?.id 
+  })
+
+  // Fetch all problems for navigation
+  const { 
+    data: problemsData, 
+    isLoading: problemsLoading 
+  } = useProblems({
+    filters: {},
+    sort: { field: 'created_at', direction: 'desc' },
+    page: 1,
+    limit: 100, // Get more problems for navigation
+    userId: user?.id
+  })
+
+  const currentProblem = problemData?.problem
+  const problems = problemsData?.problems || []
+
+  // Reset editor state when problem changes
   useEffect(() => {
-    const loadData = async () => {
-      try {
-        // Load all problems if not already loaded
-        if (problems.length === 0) {
-          await loadProblemsData()
-        }
-        
-        // Load the specific problem by slug
-        await loadProblemBySlug(slug)
-      } catch (err) {
-        console.error('Error loading problem:', err)
-        toast({
-          title: "Error",
-          description: "Failed to load problem. Please try again.",
-          variant: "destructive",
-        })
-      }
+    if (currentProblem) {
+      resetForNewProblem(currentProblem)
     }
+  }, [currentProblem, resetForNewProblem])
 
-    if (slug) {
-      loadData()
+  // Navigation functions
+  const navigateToNext = () => {
+    if (!currentProblem || problems.length === 0) return null
+    
+    const currentIndex = problems.findIndex(p => p.id === currentProblem.id)
+    const nextIndex = (currentIndex + 1) % problems.length
+    const nextProblem = problems[nextIndex]
+    
+    if (nextProblem) {
+      router.push(`/problems/${nextProblem.slug}`)
     }
-  }, [slug, problems.length, loadProblemsData, loadProblemBySlug, toast])
+    return nextProblem
+  }
+
+  const navigateToPrevious = () => {
+    if (!currentProblem || problems.length === 0) return null
+    
+    const currentIndex = problems.findIndex(p => p.id === currentProblem.id)
+    const prevIndex = (currentIndex - 1 + problems.length) % problems.length
+    const prevProblem = problems[prevIndex]
+    
+    if (prevProblem) {
+      router.push(`/problems/${prevProblem.slug}`)
+    }
+    return prevProblem
+  }
+
+  const navigateToRandom = () => {
+    if (!currentProblem || problems.length <= 1) return null
+    
+    const currentIndex = problems.findIndex(p => p.id === currentProblem.id)
+    let randomIndex
+    do {
+      randomIndex = Math.floor(Math.random() * problems.length)
+    } while (randomIndex === currentIndex)
+    
+    const randomProblem = problems[randomIndex]
+    if (randomProblem) {
+      router.push(`/problems/${randomProblem.slug}`)
+    }
+    return randomProblem
+  }
 
   // Keyboard shortcuts
   useEffect(() => {
@@ -95,17 +134,19 @@ export default function ProblemEditor() {
     }
   }, [router, navigateToNext, navigateToPrevious, navigateToRandom])
 
-  if (isLoading || !currentProblem) {
+  // Show loading while fetching problem or if we don't have the current problem yet
+  if (problemLoading || !currentProblem) {
     return <LoadingSkeleton />
   }
 
-  if (error) {
+  // Show error if problem failed to load
+  if (problemError) {
     return (
       <div className="min-h-screen bg-background flex items-center justify-center">
         <div className="text-center">
           <h1 className="text-2xl font-bold mb-2">Problem Not Found</h1>
           <p className="text-muted-foreground mb-4">
-            {error || "The problem you're looking for doesn't exist."}
+            {problemError.message || "The problem you're looking for doesn't exist."}
           </p>
           <button 
             onClick={() => window.location.href = '/editor'}

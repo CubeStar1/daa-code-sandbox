@@ -1,6 +1,6 @@
 import { type NextRequest, NextResponse } from "next/server"
 import { JUDGE0_API_URL, RAPIDAPI_KEY, RAPIDAPI_HOST } from "@/lib/judge0"
-import { executeOneCompiler, OneCompilerResponse, OneCompilerErrorResponse } from "../../../lib/onecompiler"
+import { executeOneCompiler, OneCompilerResponse, OneCompilerErrorResponse } from "@/lib/onecompiler"
 import type { ProgrammingLanguage } from "@/lib/database-types"
 
 // Language mapping for Judge0

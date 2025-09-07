@@ -1,6 +1,5 @@
 import { useProblems } from "@/hooks/use-problems-api"
 import useUser from "@/hooks/use-user"
-import { useMemo } from "react"
 import type { Problem, DifficultyLevel } from "@/lib/database-types"
 
 export function useProblemsData() {
@@ -34,19 +33,15 @@ export function useFilteredProblems(
 ) {
   return useMemo(() => {
     return problems.filter(problem => {
-      // Filter by difficulty
-      if (difficultyFilter !== "all" && problem.difficulty !== difficultyFilter) {
-        return false
-      }
-
-      // Filter by status
-      if (statusFilter !== "all") {
-        const isSolved = problem.user_stats?.is_solved || false
-        if (statusFilter === "solved" && !isSolved) return false
-        if (statusFilter === "unsolved" && isSolved) return false
-      }
-
-      return true
+      // Difficulty filter
+      const matchesDifficulty = difficultyFilter === "all" || problem.difficulty === difficultyFilter
+      
+      // Status filter
+      const matchesStatus = statusFilter === "all" || 
+                           (statusFilter === "solved" && problem.user_stats?.is_solved) ||
+                           (statusFilter === "unsolved" && !problem.user_stats?.is_solved)
+      
+      return matchesDifficulty && matchesStatus
     })
   }, [problems, difficultyFilter, statusFilter])
 }

@@ -4,6 +4,7 @@ import { useState, useEffect } from "react";
 import { useTheme } from "next-themes"
 import Editor from "@monaco-editor/react";
 import { useEditorStore } from "@/lib/stores/editor-store";
+import { useSubmitCode } from "@/hooks/use-submit-code";
 
 import { Badge } from "@/components/ui/badge"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
@@ -20,11 +21,12 @@ export function InputOutput() {
     output,
     executionStats,
     isRunning,
-    isSubmitting,
     testResults,
     submissionStatus,
     setInput
   } = useEditorStore();
+
+  const { isSubmitting } = useSubmitCode();
   const { theme: appTheme } = useTheme()
   
   useEffect(() => {

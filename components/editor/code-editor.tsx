@@ -7,8 +7,11 @@ import { useState } from "react"
 import { useTheme } from "next-themes"
 import Editor from "@monaco-editor/react"
 import { useEditorStore } from "@/lib/stores/editor-store"
+import { useSubmitCode } from "@/hooks/use-submit-code"
+import { useProblem } from "@/hooks/use-problems-api"
 import type { ProgrammingLanguage } from "@/lib/database-types"
 import useUser from "@/hooks/use-user"
+import { useParams } from "next/navigation"
 
 const getLanguageDisplayName = (language: ProgrammingLanguage): string => {
   const languageMap: Record<ProgrammingLanguage, string> = {
@@ -44,19 +47,27 @@ export function CodeEditor() {
   const [copied, setCopied] = useState(false)
   const { theme: appTheme } = useTheme()
   const { data: user } = useUser()
+  const params = useParams()
+  const slug = params.slug as string
 
   const {
-    currentProblem,
     code,
     selectedLanguage,
     isRunning,
-    isSubmitting,
     setCode,
     changeLanguage,
     runCode,
-    submitCode,
     copyCode
   } = useEditorStore()
+
+  const { submitCode, isSubmitting } = useSubmitCode()
+  
+  // Get current problem data
+  const { data: problemData } = useProblem({ 
+    slug, 
+    userId: user?.id 
+  })
+  const currentProblem = problemData?.problem
 
   const userId = user?.id || "temp-user-id"
 
@@ -69,8 +80,8 @@ export function CodeEditor() {
   }
 
   const handleSubmit = async () => {
-    if (userId) {
-      await submitCode(userId)
+    if (userId && currentProblem) {
+      await submitCode(currentProblem.id, userId)
     }
   }
 
