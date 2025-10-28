@@ -50,7 +50,12 @@ export async function executeOneCompiler(
   } else if (languageId === CPP_LANGUAGE_ID_JUDGE0) {
     oneCompilerLanguage = ONECOMPILER_CPP_LANG;
     fileName = "main.cpp";
-  } else {
+  }
+  else if(languageId === 71){
+    oneCompilerLanguage = "python";
+    fileName = "main.py";
+  }
+  else {
     return {
       status: "error",
       message: `OneCompiler integration currently only supports C (ID ${C_LANGUAGE_ID_JUDGE0}) and C++ (ID ${CPP_LANGUAGE_ID_JUDGE0}). Received ${languageId}.`,

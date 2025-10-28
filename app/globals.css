@@ -72,3 +72,43 @@
     @apply bg-background text-foreground;
   }
 }
+
+/* Modern Minimal Scrollbar */
+::-webkit-scrollbar {
+  width: 8px;
+  height: 8px;
+}
+
+/* Track */
+::-webkit-scrollbar-track {
+  background: transparent; /* seamless look */
+  border-radius: 9999px;
+}
+
+/* Light Mode - Thumb */
+::-webkit-scrollbar-thumb {
+  background: rgba(100, 100, 100, 0.4); /* subtle gray */
+  border-radius: 9999px;
+}
+
+/* Light Mode - Thumb Hover */
+::-webkit-scrollbar-thumb:hover {
+  background: rgba(100, 100, 100, 0.6);
+}
+
+/* Dark Mode - Track */
+.dark ::-webkit-scrollbar-track {
+  background: transparent;
+}
+
+/* Dark Mode - Thumb */
+.dark ::-webkit-scrollbar-thumb {
+  background: rgba(200, 200, 200, 0.3); /* lighter for dark bg */
+}
+
+/* Dark Mode - Thumb Hover */
+.dark ::-webkit-scrollbar-thumb:hover {
+  background: rgba(200, 200, 200, 0.5);
+}
+
+@source "../node_modules/streamdown/dist/index.js";
