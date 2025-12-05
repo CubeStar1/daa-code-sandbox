@@ -11,8 +11,7 @@ import { ProblemDetailsTabs } from "@/components/editor/problem-details-tabs"
 import { CodeEditor } from "@/components/editor/code-editor"
 import { InputOutput } from "@/components/editor/input-output"
 import { ResizablePanelGroup, ResizablePanel, ResizableHandle } from "@/components/ui/resizable"
-import { useToast } from "@/components/ui/use-toast"
-import { Toaster } from "@/components/ui/toaster"
+import { toast } from "sonner"
 import { Skeleton } from "@/components/ui/skeleton"
 import useUser from "@/hooks/use-user"
 import Chat from "@/components/editor/chat"
@@ -23,7 +22,6 @@ export default function ProblemEditor(props: { params: Params }) {
   const params = use(props.params)
   const slug = params.slug;
   const isMobileView = useIsMobile()
-  const { toast } = useToast()
   const { data: user } = useUser()
   
   const { resetForNewProblem } = useEditorStore()
@@ -220,7 +218,6 @@ export default function ProblemEditor(props: { params: Params }) {
           )}
         </div>
       </div>
-      <Toaster />
     </>
   )
 }

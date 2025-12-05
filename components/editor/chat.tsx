@@ -2,16 +2,18 @@
 
 import {
   PromptInput,
+  PromptInputBody,
   PromptInputButton,
-  PromptInputModelSelect,
-  PromptInputModelSelectContent,
-  PromptInputModelSelectItem,
-  PromptInputModelSelectTrigger,
-  PromptInputModelSelectValue,
+  PromptInputFooter,
+  PromptInputSelect,
+  PromptInputSelectContent,
+  PromptInputSelectItem,
+  PromptInputSelectTrigger,
+  PromptInputSelectValue,
   PromptInputSubmit,
   PromptInputTextarea,
-  PromptInputToolbar,
   PromptInputTools,
+  type PromptInputMessage,
 } from '@/components/ai-elements/prompt-input';
 import { GlobeIcon, MicIcon } from 'lucide-react';
 import { useState } from 'react';
@@ -21,15 +23,15 @@ import {
   ConversationContent,
   ConversationScrollButton,
 } from '@/components/ai-elements/conversation';
-import { Message, MessageContent } from '@/components/ai-elements/message';
+import { Message, MessageContent, MessageResponse } from '@/components/ai-elements/message';
 import { Response } from '@/components/ai-elements/response';
 import type { ToolUIPart } from 'ai';
 import {
   Tool,
-  ToolContent,
   ToolHeader,
   ToolInput,
   ToolOutput,
+  ToolContent
 } from '@/components/ai-elements/tool';
 import { CodeBlock } from '@/components/ai-elements/code-block';
 import { TabsList, TabsTrigger } from '../ui/tabs';
@@ -43,10 +45,11 @@ const Chat = () => {
   const [text, setText] = useState<string>('');
   const [model, setModel] = useState<string>(models[0].id);
 
-  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
-    e.preventDefault();
+  const { messages, status, sendMessage } = useChat();
+
+  const handleSubmit = (message: PromptInputMessage) => {
     sendMessage(
-      { text: text },
+      { text: message.text },
       {
         body: {
           model: model,
@@ -55,8 +58,6 @@ const Chat = () => {
     );
     setText('');
   };
-
-  const { messages, status, sendMessage } = useChat();
 
   return (
     <div className="h-[calc(100vh-5rem)] bg-card rounded-lg">
@@ -76,9 +77,9 @@ const Chat = () => {
                   {message.parts.map((part, i) => {
                     if (part.type === 'text') {
                       return (
-                        <Response key={`${message.id}-${i}`}>
+                        <MessageResponse key={`${message.id}-${i}`}>
                           {part.text}
-                        </Response>
+                        </MessageResponse>
                       );
                     } else if (part.type.startsWith('tool-')) {
                       const toolPart = part as ToolUIPart;
@@ -91,7 +92,7 @@ const Chat = () => {
                               output={
                                 toolPart.output ? (
                                   <Response>
-                                    {JSON.stringify(toolPart.output, null, 2)}
+                                    {`\`\`\`json\n${JSON.stringify(toolPart.output, null, 2)}\n\`\`\``}
                                   </Response>
                                 ) : null
                               }
@@ -113,12 +114,14 @@ const Chat = () => {
 
         <div className='mx-2 mb-2'>
             <PromptInput onSubmit={handleSubmit} className="border-border">
-            <PromptInputTextarea
-                onChange={(e) => setText(e.target.value)}
-                value={text}
-                className=''
-            />
-            <PromptInputToolbar>
+            <PromptInputBody>
+                <PromptInputTextarea
+                    onChange={(e) => setText(e.target.value)}
+                    value={text}
+                    className=''
+                />
+            </PromptInputBody>
+            <PromptInputFooter>
                 <PromptInputTools>
                 <PromptInputButton>
                     <MicIcon size={16} />
@@ -127,26 +130,26 @@ const Chat = () => {
                     <GlobeIcon size={16} />
                     <span>Search</span>
                 </PromptInputButton>
-                <PromptInputModelSelect
+                <PromptInputSelect
                     onValueChange={(value) => {
                     setModel(value);
                     }}
                     value={model}
                 >
-                    <PromptInputModelSelectTrigger>
-                    <PromptInputModelSelectValue />
-                    </PromptInputModelSelectTrigger>
-                    <PromptInputModelSelectContent>
+                    <PromptInputSelectTrigger>
+                    <PromptInputSelectValue />
+                    </PromptInputSelectTrigger>
+                    <PromptInputSelectContent>
                     {models.map((model) => (
-                        <PromptInputModelSelectItem key={model.id} value={model.id}>
+                        <PromptInputSelectItem key={model.id} value={model.id}>
                         {model.name}
-                        </PromptInputModelSelectItem>
+                        </PromptInputSelectItem>
                     ))}
-                    </PromptInputModelSelectContent>
-                </PromptInputModelSelect>
+                    </PromptInputSelectContent>
+                </PromptInputSelect>
                 </PromptInputTools>
                 <PromptInputSubmit disabled={!text} status={status} />
-            </PromptInputToolbar>
+            </PromptInputFooter>
             </PromptInput>
         </div>
 
