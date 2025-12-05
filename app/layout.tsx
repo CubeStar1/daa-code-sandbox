@@ -3,7 +3,7 @@ import type { Metadata } from 'next'
 import { Inter } from 'next/font/google'
 import { ThemeProvider } from "@/components/global/theme-provider"
 import QueryProvider from "@/components/global/query-provider";
-import { Toaster } from "@/components/ui/toaster"
+import { Toaster as SonnerToaster } from "@/components/ui/sonner"
 
 const inter = Inter({ subsets: ['latin'] })
 
@@ -30,7 +30,7 @@ export default function RootLayout({
               {children}
             </ThemeProvider>
           </QueryProvider>
-        <Toaster />
+        <SonnerToaster />
       </body>
     </html>
   )
