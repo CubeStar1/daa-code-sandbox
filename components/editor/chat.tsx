@@ -15,7 +15,7 @@ import {
   PromptInputTools,
   type PromptInputMessage,
 } from '@/components/ai-elements/prompt-input';
-import { HelpCircle, Lightbulb, Bug, Zap, Plus, History, ChevronDown, Trash2 } from 'lucide-react';
+import { HelpCircle, Lightbulb, Bug, Zap, Plus, History, ChevronDown, Trash2, ExternalLink } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { useChat } from '@ai-sdk/react';
 import {
@@ -47,6 +47,7 @@ import { useEditorStore } from '@/lib/stores/editor-store';
 import useUser from '@/hooks/use-user';
 import { getUserConversations, getMessagesByConversationId, deleteChat, type Conversation as ConversationType } from '@/actions/chat';
 import { fetchMessages, convertToUIMessages } from '@/lib/supabase/queries/messages';
+import Link from 'next/link';
 
 const models = [
   { id: 'gpt-4o-mini', name: 'GPT-4o-Mini' },
@@ -338,30 +339,54 @@ const Chat = () => {
                 )}
               </div>
             ) : (
-              messages.map((message) => (
-                <Message from={message.role} key={message.id}>
-                  <MessageContent>
-                    {message.parts.map((part, i) => {
-                      if (part.type === 'text') {
-                        return (
-                          <MessageResponse key={`${message.id}-${i}`}>
-                            {part.text}
-                          </MessageResponse>
-                        );
-                      } else if (part.type.startsWith('tool-')) {
-                        const toolPart = part as ToolUIPart;
-                        return (
-                          <Tool key={`${message.id}-${i}`} defaultOpen={true}>
-                            <ToolHeader type={toolPart.type} state={toolPart.state} />
-                          </Tool>
-                        );
-                      } else {
-                        return null;
-                      }
-                    })}
-                  </MessageContent>
-                </Message>
-              ))
+              messages.map((message) => {
+                // Find createProblem tool result with slug (to show button at the end)
+                const createProblemResult = message.parts.find((part): part is ToolUIPart => {
+                  if (!part.type.startsWith('tool-')) return false;
+                  const toolPart = part as ToolUIPart;
+                  return toolPart.type === 'tool-createProblem' && 
+                         (toolPart as any).output?.success && 
+                         (toolPart as any).output?.slug;
+                });
+                const problemOutput = createProblemResult ? (createProblemResult as any).output : null;
+                
+                return (
+                  <Message from={message.role} key={message.id}>
+                    <MessageContent>
+                      {message.parts.map((part, i) => {
+                        if (part.type === 'text') {
+                          return (
+                            <MessageResponse key={`${message.id}-${i}`}>
+                              {part.text}
+                            </MessageResponse>
+                          );
+                        } else if (part.type.startsWith('tool-')) {
+                          const toolPart = part as ToolUIPart;
+                          return (
+                            <Tool key={`${message.id}-${i}`} defaultOpen={true}>
+                              <ToolHeader type={toolPart.type} state={toolPart.state} />
+                            </Tool>
+                          );
+                        } else {
+                          return null;
+                        }
+                      })}
+                      {/* Show problem link at the end of the message after all content */}
+                      {problemOutput && (
+                        <div className="mt-4 pt-3 border-t border-border">
+                          <Link 
+                            href={`/problems/${problemOutput.slug}`}
+                            className="inline-flex items-center gap-2 px-4 py-2.5 text-sm font-medium text-primary-foreground bg-primary hover:bg-primary/90 rounded-md transition-colors shadow-sm"
+                          >
+                            <ExternalLink className="h-4 w-4" />
+                            Go to Problem: {problemOutput.title}
+                          </Link>
+                        </div>
+                      )}
+                    </MessageContent>
+                  </Message>
+                );
+              })
             )}
           </ConversationContent>
           <ConversationScrollButton />
