@@ -6,7 +6,6 @@ import {
   type UIMessage,
   convertToModelMessages,
   streamText,
-  createUIMessageStream,
 } from 'ai';
 import { 
   getWeather, 
@@ -59,11 +58,6 @@ export type ChatTools = InferUITools<typeof tools>;
 
 export type ChatMessage = UIMessage<never, UIDataTypes, ChatTools>;
 
-// Generate a simple UUID
-function generateId(): string {
-  return crypto.randomUUID();
-}
-
 export async function POST(req: Request) {
   const { 
     messages, 
@@ -112,6 +106,8 @@ export async function POST(req: Request) {
   const userMessage = messages[messages.length - 1];
 
   // Handle conversation persistence if conversationId and userId are provided
+  // Do this BEFORE streaming starts to stay within request scope
+  let chatSaved = false;
   if (conversationId && userId && userMessage) {
     try {
       const existingChat = await getChatById(conversationId);
@@ -124,46 +120,50 @@ export async function POST(req: Request) {
 
       // Save the user's message
       await saveMessages([userMessage], conversationId);
+      chatSaved = true;
     } catch (error) {
       console.error("Error saving chat/message:", error);
       // Continue with the request even if persistence fails
     }
   }
 
-  // Create the streaming response with onFinish callback for saving AI response
-  const stream = createUIMessageStream({
-    generateId,
-    execute: async ({ writer }) => {
-      const result = streamText({
-        model: openai('gpt-4.1-mini'),
-        system: systemPrompt,
-        messages: convertToModelMessages(messages),
-        tools,
-        stopWhen: stepCountIs(10),
-        onError: (error) => {
-          console.error("Chat stream error:", error);
-        },
-      });
-
-      result.consumeStream();
-
-      writer.merge(
-        result.toUIMessageStream({
-          sendReasoning: true,
-        })
-      );
-    },
-    onFinish: async ({ messages: generatedMessages }) => {
-      // Save AI response messages to the conversation
-      if (conversationId && userId && generatedMessages && generatedMessages.length > 0) {
+  // Create the streaming response using the simple pattern
+  // convertToModelMessages is async in AI SDK 6
+  const modelMessages = await convertToModelMessages(messages);
+  
+  const result = streamText({
+    model: openai('gpt-4.1-mini'),
+    system: systemPrompt,
+    messages: modelMessages,
+    tools,
+    stopWhen: stepCountIs(10),
+    onFinish: async ({ response }) => {
+      // Save assistant response after streaming completes
+      if (conversationId && userId && chatSaved) {
         try {
-          await saveMessages(generatedMessages as UIMessage[], conversationId);
+          // response.messages contains the assistant's messages
+          const assistantMessages = response.messages.map((msg) => ({
+            id: crypto.randomUUID(), // Generate new UUID since ResponseMessage doesn't have id
+            role: msg.role as 'user' | 'assistant',
+            content: typeof msg.content === 'string' 
+              ? msg.content 
+              : msg.content.map((c: any) => c.type === 'text' ? c.text : '').join(''),
+            parts: typeof msg.content === 'string'
+              ? [{ type: 'text' as const, text: msg.content }]
+              : msg.content.map((c: any) => {
+                  if (c.type === 'text') return { type: 'text' as const, text: c.text };
+                  if (c.type === 'tool-call') return { type: 'tool-invocation' as const, ...c };
+                  return c;
+                }),
+          }));
+          
+          await saveMessages(assistantMessages as any, conversationId);
         } catch (error) {
-          console.error("Error saving AI response:", error);
+          console.error("Error saving assistant response:", error);
         }
       }
     },
   });
 
-  return new Response(stream);
+  return result.toUIMessageStreamResponse();
 }

@@ -15,7 +15,7 @@ import {
   PromptInputTools,
   type PromptInputMessage,
 } from '@/components/ai-elements/prompt-input';
-import { HelpCircle, Lightbulb, Bug, Zap, Plus, History, ChevronDown } from 'lucide-react';
+import { HelpCircle, Lightbulb, Bug, Zap, Plus, History, ChevronDown, Trash2 } from 'lucide-react';
 import { useState, useEffect, useCallback } from 'react';
 import { useChat } from '@ai-sdk/react';
 import {
@@ -45,7 +45,7 @@ import {
 } from "@/components/ui/dropdown-menu";
 import { useEditorStore } from '@/lib/stores/editor-store';
 import useUser from '@/hooks/use-user';
-import { getUserConversations, getMessagesByConversationId, type Conversation as ConversationType } from '@/actions/chat';
+import { getUserConversations, getMessagesByConversationId, deleteChat, type Conversation as ConversationType } from '@/actions/chat';
 import { fetchMessages, convertToUIMessages } from '@/lib/supabase/queries/messages';
 
 const models = [
@@ -58,6 +58,7 @@ const Chat = () => {
   const [conversationId, setConversationId] = useState<string | null>(null);
   const [conversations, setConversations] = useState<ConversationType[]>([]);
   const [isLoadingHistory, setIsLoadingHistory] = useState(false);
+  const [pendingMessages, setPendingMessages] = useState<any[] | null>(null);
   
   const { getEditorContext, currentProblem, output } = useEditorStore();
   const { data: user } = useUser();
@@ -65,6 +66,15 @@ const Chat = () => {
   const { messages, status, sendMessage, setMessages } = useChat({
     id: conversationId || undefined,
   });
+
+  // Effect to set messages AFTER conversationId change has taken effect
+  useEffect(() => {
+    if (pendingMessages !== null && conversationId) {
+      setMessages(pendingMessages);
+      setPendingMessages(null);
+      setIsLoadingHistory(false);
+    }
+  }, [conversationId, pendingMessages, setMessages]);
 
   // Load user's conversations on mount
   useEffect(() => {
@@ -84,17 +94,21 @@ const Chat = () => {
   // Load messages when conversationId changes
   const loadConversation = useCallback(async (convId: string) => {
     setIsLoadingHistory(true);
+    
     try {
       const dbMessages = await fetchMessages(convId);
       const uiMessages = convertToUIMessages(dbMessages);
-      setMessages(uiMessages);
+      
+      // Store messages to be set after conversationId updates
+      setPendingMessages(uiMessages);
+      // Change conversationId - this will trigger useChat to switch contexts
       setConversationId(convId);
+      // The useEffect above will set the messages after the id change takes effect
     } catch (error) {
       console.error('Error loading conversation:', error);
-    } finally {
       setIsLoadingHistory(false);
     }
-  }, [setMessages]);
+  }, []);
 
   // Start a new conversation
   const startNewConversation = useCallback(() => {
@@ -102,6 +116,26 @@ const Chat = () => {
     setConversationId(newId);
     setMessages([]);
   }, [setMessages]);
+
+  // Delete a conversation
+  const handleDeleteChat = useCallback(async (e: React.MouseEvent, chatId: string) => {
+    e.stopPropagation(); // Prevent triggering the parent onClick
+    
+    try {
+      const success = await deleteChat(chatId);
+      if (success) {
+        // Remove from local state
+        setConversations(prev => prev.filter(c => c.id !== chatId));
+        
+        // If we deleted the current conversation, start a new one
+        if (chatId === conversationId) {
+          startNewConversation();
+        }
+      }
+    } catch (error) {
+      console.error('Error deleting chat:', error);
+    }
+  }, [conversationId, startNewConversation]);
 
   // Initialize conversation ID on first render
   useEffect(() => {
@@ -206,9 +240,17 @@ const Chat = () => {
                       <DropdownMenuItem 
                         key={conv.id}
                         onClick={() => loadConversation(conv.id)}
-                        className={conv.id === conversationId ? 'bg-accent' : ''}
+                        className={`${conv.id === conversationId ? 'bg-accent' : ''} group`}
                       >
-                        <span className="truncate">{conv.title}</span>
+                        <span className="truncate flex-1">{conv.title}</span>
+                        <Button
+                          variant="ghost"
+                          size="sm"
+                          className="h-6 w-6 p-0 opacity-0 group-hover:opacity-100 ml-2 hover:bg-destructive hover:text-destructive-foreground"
+                          onClick={(e) => handleDeleteChat(e, conv.id)}
+                        >
+                          <Trash2 className="h-3 w-3" />
+                        </Button>
                       </DropdownMenuItem>
                     ))}
                   </>

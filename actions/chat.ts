@@ -112,6 +112,12 @@ export async function deleteChat(id: string): Promise<boolean> {
   return true;
 }
 
+// Helper to validate UUID format
+function isValidUUID(str: string): boolean {
+  const uuidRegex = /^[0-9a-f]{8}-[0-9a-f]{4}-[1-5][0-9a-f]{3}-[89ab][0-9a-f]{3}-[0-9a-f]{12}$/i;
+  return uuidRegex.test(str);
+}
+
 // Save messages to a conversation
 export async function saveMessages(
   messages: UIMessage[],
@@ -119,18 +125,37 @@ export async function saveMessages(
 ): Promise<boolean> {
   const supabase = await createSupabaseServer();
 
-  const messagesToInsert = messages.map((msg) => ({
-    id: msg.id,
-    conversation_id: conversationId,
-    role: msg.role,
-    content: getMessageContent(msg),
-    tool_invocations: msg.parts?.filter((p) => p.type.startsWith("tool-")) || null,
-    created_at: new Date().toISOString(),
-  }));
+  // First, get existing message IDs for this conversation to avoid duplicates
+  const { data: existingMessages } = await supabase
+    .from("messages")
+    .select("id, content")
+    .eq("conversation_id", conversationId);
+
+  const existingContentSet = new Set(existingMessages?.map(m => m.content) || []);
+
+  const messagesToInsert = messages
+    .filter(msg => {
+      // Skip messages that already exist (check by content to avoid duplicates)
+      const content = getMessageContent(msg);
+      return content && !existingContentSet.has(content);
+    })
+    .map((msg) => ({
+      // Always generate new UUID for database storage
+      id: crypto.randomUUID(),
+      conversation_id: conversationId,
+      role: msg.role,
+      content: getMessageContent(msg),
+      tool_invocations: msg.parts?.filter((p) => p.type.startsWith("tool-")) || null,
+      created_at: new Date().toISOString(),
+    }));
+
+  if (messagesToInsert.length === 0) {
+    return true; // No new messages to save
+  }
 
   const { error } = await supabase
     .from("messages")
-    .upsert(messagesToInsert, { onConflict: "id" });
+    .insert(messagesToInsert);
 
   if (error) {
     console.error("Error saving messages:", error);
