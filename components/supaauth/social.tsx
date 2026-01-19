@@ -19,20 +19,20 @@ export default function Social({ redirectTo }: { redirectTo: string }) {
   return (
     <div className="w-full flex gap-2">
       <Button
-        className="w-full h-8 flex items-center gap-5"
+        className="flex-1 h-10 sm:h-11 flex items-center justify-center gap-2 text-sm"
         variant="outline"
         onClick={() => loginWithProvider("github")}
       >
-        <IoLogoGithub />
-        Github
+        <IoLogoGithub className="w-4 h-4" />
+        <span className="truncate">Github</span>
       </Button>
       <Button
-        className="w-full h-8 flex items-center gap-2"
+        className="flex-1 h-10 sm:h-11 flex items-center justify-center gap-2 text-sm"
         variant="outline"
         onClick={() => loginWithProvider("google")}
       >
-        <FcGoogle />
-        Google
+        <FcGoogle className="w-4 h-4" />
+        <span className="truncate">Google</span>
       </Button>
     </div>
   );
