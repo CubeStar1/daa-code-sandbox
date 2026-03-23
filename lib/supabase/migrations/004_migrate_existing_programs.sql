@@ -88,7 +88,7 @@ $$;
 
 -- Sample migration for one specific program (Assignment Problem)
 -- This shows the pattern you should follow for each program
-DO $$
+DO $block$
 DECLARE
     assignment_problem_id UUID;
     backtracking_cat_id UUID;
@@ -115,7 +115,7 @@ BEGIN
         uuid_generate_v4(),
         'Assignment Problem (Branch & Bound)',
         'assignment-problem-branch-bound',
-        '# Assignment Problem (Branch & Bound)
+        $desc$# Assignment Problem (Branch & Bound)
 
 The Assignment Problem seeks to assign a set of tasks to a set of workers (or vice-versa) in a one-to-one manner such that the total cost of assignment is minimized. This implementation uses a Branch and Bound approach.
 
@@ -129,11 +129,11 @@ Given an N×N cost matrix where `cost[i][j]` represents the cost of assigning wo
 
 - Each worker must be assigned exactly one task
 - Each task must be assigned exactly one worker
-- Minimize the total assignment cost',
+- Minimize the total assignment cost$desc$,
         'hard',
-        '- 1 ≤ N ≤ 20 (number of workers/tasks)
+        $constraints$- 1 ≤ N ≤ 20 (number of workers/tasks)
 - 1 ≤ cost[i][j] ≤ 1000
-- All costs are positive integers',
+- All costs are positive integers$constraints$,
         ARRAY[
             'Think about how to represent the state space of partial assignments',
             'Consider how to calculate a lower bound for remaining assignments',
@@ -151,27 +151,27 @@ Given an N×N cost matrix where `cost[i][j]` represents the cost of assigning wo
     
     -- Add test cases
     INSERT INTO problem_test_cases (problem_id, input, expected_output, is_example, order_index) VALUES
-    (assignment_problem_id, '3
+    (assignment_problem_id, $input1$3
 25 10 15
 10 30 5
-20 10 35', 'Minimum Total Cost: 35
+20 10 35$input1$, $output1$Minimum Total Cost: 35
 Optimal Assignments:
 Worker 0 -> Task 1 (Cost: 10)
 Worker 1 -> Task 2 (Cost: 5)
-Worker 2 -> Task 0 (Cost: 20)', true, 1),
+Worker 2 -> Task 0 (Cost: 20)$output1$, true, 1),
     
-    (assignment_problem_id, '2
+    (assignment_problem_id, $input2$2
 1 2
-3 4', 'Minimum Total Cost: 5
+3 4$input2$, $output2$Minimum Total Cost: 5
 Optimal Assignments:
 Worker 0 -> Task 0 (Cost: 1)
-Worker 1 -> Task 1 (Cost: 4)', true, 2),
+Worker 1 -> Task 1 (Cost: 4)$output2$, true, 2),
     
-    (assignment_problem_id, '4
+    (assignment_problem_id, $input3$4
 9 2 7 8
 6 4 3 7
 5 8 1 8
-7 6 9 4', 'Minimum Total Cost: 13', false, 3);
+7 6 9 4$input3$, 'Minimum Total Cost: 13', false, 3);
     
     -- Create editorial
     INSERT INTO problem_editorials (
@@ -187,14 +187,14 @@ Worker 1 -> Task 1 (Cost: 4)', true, 2),
         assignment_problem_id,
         'Branch and Bound Approach',
         'Use a systematic tree search with intelligent pruning to find the optimal assignment while avoiding exploration of suboptimal solution branches.',
-        'The brute force approach would enumerate all N! possible assignments, which is prohibitively expensive. Branch and Bound improves on this by:
+        $intuition$The brute force approach would enumerate all N! possible assignments, which is prohibitively expensive. Branch and Bound improves on this by:
 
 1. **Systematic Exploration**: Build assignments one worker at a time
 2. **Lower Bound Calculation**: Estimate the minimum possible cost for any complete assignment extending the current partial assignment
 3. **Pruning**: Eliminate branches where the lower bound exceeds the best known solution
 
-The key insight is that if we can prove a partial assignment cannot lead to a better solution than what we''ve already found, we can skip exploring that entire subtree.',
-        '## Algorithm Steps
+The key insight is that if we can prove a partial assignment cannot lead to a better solution than what we've already found, we can skip exploring that entire subtree.$intuition$,
+        $steps$## Algorithm Steps
 
 1. **Initialize**: Set `min_total_cost = ∞` and `best_assignment = empty`
 
@@ -217,8 +217,8 @@ The key insight is that if we can prove a partial assignment cannot lead to a be
      - Recursively solve for `worker_idx + 1`
      - Backtrack (remove assignment)
 
-4. **Initial Call**: `solve(0, empty_assignment, 0, 0)`',
-        '## Time Complexity
+4. **Initial Call**: `solve(0, empty_assignment, 0, 0)`$steps$,
+        $complexity$## Time Complexity
 
 - **Best Case**: O(N²) when pruning is very effective and optimal path is found early
 - **Average Case**: Highly variable, often much better than worst case due to pruning
@@ -235,14 +235,14 @@ The key insight is that if we can prove a partial assignment cannot lead to a be
 2. **Search Order**: Exploring promising branches first improves pruning
 3. **State Representation**: Efficient tracking of assigned tasks (bitmask)
 
-The effectiveness heavily depends on the problem instance and bound quality.',
+The effectiveness heavily depends on the problem instance and bound quality.$complexity$,
         '{"cpp": "#include <bits/stdc++.h>\nusing namespace std;\n\n#define INF INT_MAX\n\nint n_ap;\nvector<vector<int>> cost_matrix_ap;\nvector<int> current_assignment_ap;\nvector<int> final_assignment_ap;\nvector<bool> task_assigned_ap;\nint min_total_cost_ap = INF;\n\nvoid solve_assignment_recursive(int worker_idx, int current_path_cost) {\n    if (worker_idx == n_ap) {\n        if (current_path_cost < min_total_cost_ap) {\n            min_total_cost_ap = current_path_cost;\n            final_assignment_ap = current_assignment_ap;\n        }\n        return;\n    }\n\n    if (current_path_cost >= min_total_cost_ap) {\n        return;\n    }\n\n    for (int task_idx = 0; task_idx < n_ap; task_idx++) {\n        if (!task_assigned_ap[task_idx]) {\n            task_assigned_ap[task_idx] = true;\n            current_assignment_ap[worker_idx] = task_idx;\n            \n            int new_cost = current_path_cost + cost_matrix_ap[worker_idx][task_idx];\n\n            if (new_cost < min_total_cost_ap) {\n                 solve_assignment_recursive(worker_idx + 1, new_cost);\n            }\n\n            task_assigned_ap[task_idx] = false;\n        }\n    }\n}\n\nint main() {\n    cout << \"Enter the number of workers/tasks (N): \\n\";\n    cin >> n_ap;\n\n    if (n_ap <= 0) {\n        cout << \"Invalid N.\" << endl;\n        return 1;\n    }\n\n    cost_matrix_ap.assign(n_ap, vector<int>(n_ap));\n    cout << \"Enter the cost matrix (\" << n_ap << \" x \" << n_ap << \"):\" << endl;\n    for (int i = 0; i < n_ap; i++) {\n        for (int j = 0; j < n_ap; j++) {\n            cin >> cost_matrix_ap[i][j];\n        }\n    }\n\n    task_assigned_ap.assign(n_ap, false);\n    current_assignment_ap.assign(n_ap, -1);\n    min_total_cost_ap = INF;\n\n    solve_assignment_recursive(0, 0);\n\n    if (min_total_cost_ap == INF) {\n        cout << \"No valid assignment found.\" << endl;\n    } else {\n        cout << \"Minimum Total Cost: \" << min_total_cost_ap << endl;\n        cout << \"Optimal Assignments:\" << endl;\n        for (int i = 0; i < n_ap; i++) {\n            cout << \"Worker \" << i << \" -> Task \" << final_assignment_ap[i] \n                      << \" (Cost: \" << cost_matrix_ap[i][final_assignment_ap[i]] << \")\" << endl;\n        }\n    }\n\n    return 0;\n}", "c": "#include <stdio.h>\n#include <limits.h>\n\n#define N 10\n\nint n;\nint cost[N][N];\nint visited[N];\nint minCost = INT_MAX;\n\nvoid assignTasks(int level, int currentCost) {\n    if (level == n) {\n        if (currentCost < minCost)\n            minCost = currentCost;\n        return;\n    }\n\n    for (int i = 0; i < n; i++) {\n        if (!visited[i]) {\n            visited[i] = 1;\n            assignTasks(level + 1, currentCost + cost[level][i]);\n            visited[i] = 0;\n        }\n    }\n}\n\nint main() {\n    printf(\"Enter number of agents/tasks: \\n\");\n    scanf(\"%d\", &n);\n\n    printf(\"Enter cost matrix (%d x %d):\\n\", n, n);\n    for (int i = 0; i < n; i++)\n        for (int j = 0; j < n; j++)\n            scanf(\"%d\", &cost[i][j]);\n    \n\n    assignTasks(0, 0);\n\n    printf(\"Minimum Assignment Cost: %d\\n\", minCost);\n    return 0;\n}", "python": "", "java": "", "javascript": "", "typescript": "", "go": "", "rust": "", "c#": ""}'::jsonb,
         true
     );
     
     RAISE NOTICE 'Successfully migrated Assignment Problem as sample. Use this pattern for other programs.';
 END;
-$$;
+$block$;
 
 -- Clean up temporary objects
 DROP TABLE IF EXISTS category_mapping;

@@ -12,7 +12,25 @@ interface TestCaseResult {
   memory_mb?: number;
 }
 
+// Context to pass to AI assistant
+export interface EditorContext {
+  problemTitle?: string;
+  problemDescription?: string;
+  code?: string;
+  language?: string;
+  output?: string;
+  testResults?: {
+    passed: boolean;
+    input: string;
+    expected: string;
+    actual: string;
+  }[];
+}
+
 interface EditorState {
+  // Current problem context
+  currentProblem: Problem | null
+  
   // Current editing state
   selectedLanguage: ProgrammingLanguage
   code: string
@@ -29,6 +47,7 @@ interface EditorState {
   submissionStatus: SubmissionStatus | null
   
   // Basic setters
+  setCurrentProblem: (problem: Problem | null) => void
   setSelectedLanguage: (language: ProgrammingLanguage) => void
   setCode: (code: string) => void
   setInput: (input: string) => void
@@ -47,10 +66,12 @@ interface EditorState {
   
   // Utility actions
   copyCode: () => Promise<boolean>
+  getEditorContext: () => EditorContext
 }
 
 export const useEditorStore = create<EditorState>((set, get) => ({
   // Initial state
+  currentProblem: null,
   selectedLanguage: 'cpp',
   code: '',
   input: '',
@@ -62,6 +83,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
   submissionStatus: null,
 
   // Basic setters
+  setCurrentProblem: (problem) => set({ currentProblem: problem }),
   setSelectedLanguage: (language) => set({ selectedLanguage: language }),
   setCode: (code) => set({ code }),
   setInput: (input) => set({ input }),
@@ -84,6 +106,25 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     }
   },
 
+  // Get editor context for AI assistant
+  getEditorContext: () => {
+    const { currentProblem, code, selectedLanguage, output, testResults } = get()
+    
+    return {
+      problemTitle: currentProblem?.title,
+      problemDescription: currentProblem?.description,
+      code,
+      language: selectedLanguage,
+      output,
+      testResults: testResults.map(t => ({
+        passed: t.passed,
+        input: t.input,
+        expected: t.expected_output,
+        actual: t.actual_output || '',
+      })),
+    }
+  },
+
   resetForNewProblem: (problem) => {
     const { selectedLanguage } = get()
     
@@ -91,6 +132,7 @@ export const useEditorStore = create<EditorState>((set, get) => ({
     const defaultCode = getStarterCode(selectedLanguage)
 
     set({
+      currentProblem: problem || null,
       code: defaultCode,
       input: getDefaultInput(problem),
       output: '',

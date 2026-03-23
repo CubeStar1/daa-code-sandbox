@@ -52,6 +52,7 @@ export const createProblem = tool({
       return {
         success: true,
         problemId: data.id,
+        slug,
         message: `Problem "${title}" created successfully with ID: ${data.id}`,
         title,
         difficulty,
